@@ -1,13 +1,13 @@
-# Install expect to install Miniconda automatically
-#sudo apt install expect
-
 # Download Miniconda file
-# wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-
-
-# TODO: Create a better expect script with "sudo autoexpect
-# -f install_miniconda.exp bash Miniconda*.sh"
-
+wget https://repo.anaconda.com/miniconda/Miniconda3-py310_23.1.0-1-Linux-x86_64.sh \
+-O ~/miniconda.sh
 
 # Install Miniconda
-expect install_miniconda.exp
+CONDA_DIR=$HOME/miniconda3
+chmod +x ~/miniconda.sh
+~/miniconda.sh -b -p $CONDA_DIR
+rm ~/miniconda.sh
+
+# Conda initilization
+~/miniconda3/bin/conda init
+source ~/.bashrc
