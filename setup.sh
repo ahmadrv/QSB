@@ -9,5 +9,15 @@ chmod +x ~/miniconda.sh
 rm ~/miniconda.sh
 
 # Conda initilization
-~/miniconda3/bin/conda init
-source ~/.bashrc
+$CONDA_DIR/bin/conda init
+exec bash
+conda activate
+
+# Conda create enviorment
+conda create -y --name QSimBench --clone base
+
+# Conda activate new enviorment
+conda activate QSimBench
+
+# Install packages
+pip install -r ./requirements.txt
