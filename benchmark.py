@@ -10,6 +10,7 @@ class Benchmark:
         ideal gates in the quantum circuit. It can be calculated by comparing
         the output of the simulator to the expected output for a given circuit.
         '''
+        # TODO: Implement gate fidelity metric
         pass
     
     def circuit_depth(self, *args, **kwargs):
@@ -19,6 +20,7 @@ class Benchmark:
         circuit. A shorter circuit depth generally implies a faster execution
         time and a lower error rate.
         '''
+        # TODO: Implement circuit depth metric
         pass
      
     def runtime(self, *args, **kwargs):
@@ -28,6 +30,7 @@ class Benchmark:
         the quantum circuit. A faster runtime generally implies
         a more efficient simulator.
         '''
+        # TODO: Implement runtime metric
         pass
     
     def memory_usage(self, *args, **kwargs):
@@ -37,5 +40,15 @@ class Benchmark:
         execution. As the size and complexity of the circuit increases,
         so does the memory usage.
         '''
+        # TODO: Implement memory usage metric
         pass
     
+    def accuracy(self, *args, **kwargs):
+        '''
+        This metric measures the accuracy of the simulator in reproducing
+        the correct statistical distribution of outcomes for a given circuit.
+        This is especially important for applications where the statistical
+        distribution of outcomes is crucial, such as quantum machine learning.
+        '''
+        # TODO: Implement accuracy metric
+        pass
