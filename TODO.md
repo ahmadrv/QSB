@@ -1,0 +1,2 @@
+- Deploy
+  - [ ] At the end of developing phase, Make Dockerfile
