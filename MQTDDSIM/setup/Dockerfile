@@ -6,6 +6,8 @@ LABEL name="${platform}" \
       version="1.0" \
       description="MQTDDSIM installation"
 
+# [ ] TODO: Add conda installation and configuration
+
 # Install dependencies
 RUN apt-get update \
 &&  apt-get install python-is-python3 -y \
