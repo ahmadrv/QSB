@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Welcome message
 echo "This script allows you to select which platform do you want to benchmark."
@@ -22,7 +22,7 @@ do
         1)
             echo "You selected ---Benchmark MQTDDSIM---"
             echo "Running benchmark..."
-            
+            ./MQTDDSIM/setup/build.sh
             break
             ;;
         2)
