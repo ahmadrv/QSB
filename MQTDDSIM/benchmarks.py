@@ -1,1 +1,0 @@
-print("This is a benchmark script for the MQTDDSIM Simulator")

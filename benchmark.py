@@ -1,5 +1,5 @@
 class Benchmark:    
-    def __init__(self, func):
+    def __init__(self, func=None):
         self.func = func
         self.metrics = dict()
         
