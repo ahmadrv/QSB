@@ -5,5 +5,7 @@ import os
 sys.path.append(os.getcwd())
 
 import benchmark
+import interface
 
 print(benchmark.Benchmark().metrics)
+print(interface.args)

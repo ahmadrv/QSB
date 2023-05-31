@@ -22,13 +22,8 @@ parser.add_argument(
 args, additional_args = parser.parse_known_args()
 
 # Access the named arguments
-name = args.name
-age = args.age
+num_qubits = args.num_qubits
+benchmark_algorithm = args.benchmark_algorithm
 
 # Access the additional arguments
 additional_arguments = additional_args
-
-# Print the arguments
-print("Named Arguments - Name:", name)
-print("Named Arguments - Age:", age)
-print("Additional Arguments:", additional_arguments)

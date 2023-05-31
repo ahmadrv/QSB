@@ -1,6 +1,14 @@
 #!/bin/sh
 
 # [ ]: Check installation of python and pip
+# Update the package list
+sudo apt-get update -y
+
+# Install python
+apt-get install -y python
+
+# Install pip
+apt-get install -y python3-pip
 
 # Set the version of python
 sudo apt install python-is-python3
