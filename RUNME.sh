@@ -17,7 +17,7 @@ sudo apt install python-is-python3 -y
 pip install virtualenv
 
 # Create a Python virtual environment
-python -m venv QSBenv
+virtualenv QSBenv
 
 # Activate the virtual environment
 source ./QSBenv/bin/activate
