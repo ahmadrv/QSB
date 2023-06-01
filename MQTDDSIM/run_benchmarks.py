@@ -1,11 +1,8 @@
-import sys
-import os
-
-# Add the current working directory to the sys.path list.
+import sys, os
 sys.path.append(os.getcwd())
 
-import benchmark
-import interface
+from benchmark import benchmark
+from benchmark import interface
 
 print(benchmark.Benchmark().metrics)
 print(interface.args)

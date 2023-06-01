@@ -1,26 +1,6 @@
 #!/bin/sh
 
-# [x]: Check installation of python and pip
-# Update the package list
-sudo apt-get update -y
-
-# Install python
-apt-get install -y python
-
-# Install pip
-apt-get install -y python3-pip
-
-# Set the version of python
-sudo apt install python-is-python3 -y
-
-# Install python virtual environment package
-pip install virtualenv
-
-# Create a Python virtual environment
-virtualenv QSBenv
-
-# Activate the virtual environment
-source ./QSBenv/bin/activate
+# [ ]: The setup procedure will be reviewed in the future.
 
 # Welcome message
 echo "This script allows you to select which platform do you want to benchmark."
