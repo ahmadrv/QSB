@@ -1,7 +1,3 @@
 #!/bin/sh
 
-# Install required packages
-pip install mqt.ddsim
-
-# Run benchmark
-python ./MQTDDSIM/run_benchmarks.py
+# [ ]:The setup procedure will be reviewed in the future.
