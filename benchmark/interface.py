@@ -15,7 +15,7 @@ parser.add_argument(
     "--benchmark_algorithm",
     type=str,
     help="The benchmark algorithm."
-    "The options are: 'Deutsch-Jozsa', 'Bernstein-Vazirani', 'Hidden Shift",
+    "The options are: Deutsch-Jozsa', Bernstein-Vazirani', Hidden Shift, etc.",
 )  # [ ]: add more options
 
 # Parse the arguments
