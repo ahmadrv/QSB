@@ -1,6 +1,8 @@
 class Benchmark:
-    def __init__(self, func=None):
-        self.func = func
+    def __init__(self, simulator, algorithm, num_qubits):
+        self.simulator = simulator
+        self.algorithm = algorithm
+        self.num_qubits = num_qubits
         self.metrics = dict()
 
     def gate_fidelity(self, *args, **kwargs):
