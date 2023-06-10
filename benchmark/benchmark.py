@@ -4,7 +4,25 @@ class Benchmark:
         self.algorithm = algorithm
         self.num_qubits = num_qubits
         self.metrics = dict()
-
+    
+    def runtime(self, *args, **kwargs):
+        """
+        This metric measures the time it takes for the simulator to execute
+        the quantum circuit. A faster runtime generally implies
+        a more efficient simulator.
+        """
+        # [ ]: Implement runtime metric
+        pass
+    
+    def memory_usage(self, *args, **kwargs):
+        """
+        This metric measures the amount of memory used by the simulator during
+        execution. As the size and complexity of the circuit increases,
+        so does the memory usage.
+        """
+        # [ ]: Implement memory usage metric
+        pass
+    
     def gate_fidelity(self, *args, **kwargs):
         """
 
@@ -25,23 +43,6 @@ class Benchmark:
         # [ ]: Implement circuit depth metric
         pass
 
-    def runtime(self, *args, **kwargs):
-        """
-        This metric measures the time it takes for the simulator to execute
-        the quantum circuit. A faster runtime generally implies
-        a more efficient simulator.
-        """
-        # [ ]: Implement runtime metric
-        pass
-
-    def memory_usage(self, *args, **kwargs):
-        """
-        This metric measures the amount of memory used by the simulator during
-        execution. As the size and complexity of the circuit increases,
-        so does the memory usage.
-        """
-        # [ ]: Implement memory usage metric
-        pass
 
     def accuracy(self, *args, **kwargs):
         """
