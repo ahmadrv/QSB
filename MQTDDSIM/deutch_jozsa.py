@@ -1,11 +1,28 @@
 from qiskit import QuantumCircuit, execute
-from tools import benchmarker
 from mqt import ddsim
 import numpy as np
-import types, time
+import argparse
 
+# Create the argument parser
+parser = argparse.ArgumentParser(
+    description="The benchmark script that benchmarks simulators."
+)
 
-def dj_oracle(case: str, n: int):
+parser.add_argument(
+    "--num_qubits",
+    type=int,
+    help="The number of qubits that the simulator will simulate.",
+)
+
+parser.add_argument(
+    "--deutsch_jozsa_case",
+    type=str,
+    help="The Deutsch-Jozsa case that it should be 'balanced' or 'constant'.",
+)
+
+args, additional_args = parser.parse_known_args()
+
+def dj_oracle(case: str, n: int) -> QuantumCircuit:
     """
     This function creates a Deutsch-Jozsa oracle based on the input case and
     input qubit size n. The oracle is a black box function that takes n qubits
@@ -41,7 +58,7 @@ def dj_oracle(case: str, n: int):
     return oracle_gate
 
 
-def dj_algorithm(oracle: QuantumCircuit, n: int):
+def dj_algorithm(oracle: QuantumCircuit, n: int) -> QuantumCircuit:
     """
     This function creates a Deutsch-Jozsa algorithm based on the input oracle
     and input qubit size n.
@@ -64,31 +81,9 @@ def dj_algorithm(oracle: QuantumCircuit, n: int):
     return dj_circuit
 
 
-def circuit_builder(ID, case: str, n: int):
-    oracle_gate = dj_oracle(case, n)
-    dj_circuit = dj_algorithm(oracle_gate, n)
-
-    return dj_circuit
-
-
-def runtime(ID, case, num_qubits):
-    ID.metrics["runtime"] = dict()
-
-    dj_circuit = MQTDDSIM_deutch_jozsa.circuit_builder(case, num_qubits)
-    backend = ddsim.DDSIMProvider().get_backend("qasm_simulator")
-
-    start_time = time.time()
-    execute(dj_circuit, backend, shots=10000)
-    end_time = time.time()
-
-    exe_time = end_time - start_time
-
-    ID.metrics["runtime"][num_qubits] = exe_time
-
-
-MQTDDSIM_deutch_jozsa = benchmarker.Benchmark("Deutch-Jozsa", "MQTDDSIM")
-
-MQTDDSIM_deutch_jozsa.circuit_builder = types.MethodType(
-    circuit_builder, MQTDDSIM_deutch_jozsa
-)
-MQTDDSIM_deutch_jozsa.runtime = types.MethodType(runtime, MQTDDSIM_deutch_jozsa)
+if __name__ == '__main__':
+    
+    print(args.deutsch_jozsa_case, args.num_qubits, '%%%%%%%%%%%%%%%%%%%%%%%%%%')
+    
+    oracle_gate = dj_oracle(args.deutsch_jozsa_case, args.num_qubits)
+    dj_circuit = dj_algorithm(oracle_gate, args.num_qubits)
