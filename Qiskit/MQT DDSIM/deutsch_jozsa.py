@@ -84,3 +84,5 @@ if __name__ == '__main__':
     backend = ddsim.DDSIMProvider().get_backend('qasm_simulator')
     
     execute(dj_circuit, backend, shots=args.num_shots)
+    
+    dj_circuit.qasm(filename="deutsch_jozsa.qasm")
