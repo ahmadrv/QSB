@@ -1,21 +1,5 @@
-from qiskit import QuantumCircuit, execute
-from mqt import ddsim
+from qiskit import QuantumCircuit
 import numpy as np
-
-import sys, os
-sys.path.append(os.getcwd())
-
-from tools import interface
-
-parser = interface.parser
-
-parser.add_argument(
-    "--deutsch_jozsa_case",
-    type=str,
-    help="The Deutsch-Jozsa case that it should be 'balanced' or 'constant'.",
-)
-
-args, additional_args = parser.parse_known_args()
 
 def dj_oracle(case: str, n: int) -> QuantumCircuit:
     """
@@ -74,15 +58,3 @@ def dj_algorithm(oracle: QuantumCircuit, n: int) -> QuantumCircuit:
         dj_circuit.measure(i, i)
 
     return dj_circuit
-
-
-if __name__ == '__main__':
-        
-    oracle_gate = dj_oracle(args.deutsch_jozsa_case, args.num_qubits)
-    dj_circuit = dj_algorithm(oracle_gate, args.num_qubits)
-    
-    backend = ddsim.DDSIMProvider().get_backend('qasm_simulator')
-    
-    execute(dj_circuit, backend, shots=args.num_shots)
-    
-    dj_circuit.qasm(filename="deutsch_jozsa.qasm")
