@@ -1,6 +1,8 @@
 from qiskit import transpile
 from mqt import ddsim
 
+from pprint import pprint
+
 from pathlib import Path
 import sys
 sys.path.append(str(Path().resolve() / 'Qiskit'))
@@ -14,6 +16,9 @@ if __name__ == '__main__':
     
     provider = ddsim.DDSIMProvider()
     backend = provider.get_backend('qasm_simulator')
+    
+    print("Available Backends: ")
+    pprint(provider.backends())
         
     oracle_gate = dj_oracle(args.deutsch_jozsa_case, args.num_qubits)
     circuit = dj_algorithm(oracle_gate, args.num_qubits)
