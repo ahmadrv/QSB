@@ -1,5 +1,8 @@
-from qiskit import QuantumCircuit
+from qiskit import QuantumCircuit, transpile
+from provider import get_backend
+from interface import args
 import numpy as np
+
 
 def dj_oracle(case: str, n: int) -> QuantumCircuit:
     """
@@ -58,3 +61,14 @@ def dj_algorithm(oracle: QuantumCircuit, n: int) -> QuantumCircuit:
         dj_circuit.measure(i, i)
 
     return dj_circuit
+
+
+if __name__ == "__main__":
+    oracle_gate = dj_oracle(args.deutsch_jozsa_case, args.num_qubits)
+    circuit = dj_algorithm(oracle_gate, args.num_qubits)
+
+    backend = get_backend(args.provider, args.backend)
+
+    transpiled_circuit = transpile(circuit, backend)
+
+    backend.run(transpiled_circuit)
