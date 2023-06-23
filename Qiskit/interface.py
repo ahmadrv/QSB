@@ -24,6 +24,13 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "--platform",
+    type=str,
+    help="The platform that it should be 'qiskit', 'qulacs' or ... .",
+    # [ ]: Add other platforms.
+)
+
+parser.add_argument(
     "--provider",
     type=str,
     help="The provider that it should be 'qiskit_aer' or 'qiskit_ddsim' .",
@@ -54,8 +61,8 @@ if args.algorithm == "deutsch_jozsa":
     type=str,
     help="The Deutsch-Jozsa case that it should be 'balanced' or 'constant'.",
     )
-    
-    args, additional_args = parser.parse_known_args()
 
 elif args.algorithm == "grover":
     pass
+
+args, additional_args = parser.parse_known_args()   # This line should be the last line of this file.
