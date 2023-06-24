@@ -1,3 +1,9 @@
+'''
+[ ]: Add supported algorithms, platforms, providers, backends, benchmarks,
+     and cases here.
+'''
+
+
 algorithms = ["deutsch_jozsa"]
 
 platforms = ["Qiskit"]

@@ -86,3 +86,43 @@ def command_generator(
             benchmark_type=benchmark_type,
             deutsch_jozsa_case=deutsch_jozsa_case,
         )
+
+def general_command_generator(
+    max_num_qubits: int,
+    num_shots: int,
+    algorithms: list,
+    platforms: list,
+    providers: list,
+    backends: list,
+    benchmark_types: list,
+    deutsch_jozsa_cases: list,
+):
+    for qnum in range(3, max_num_qubits + 1):
+        for alg in algorithms:
+            for plat in platforms:
+                for prov in providers[plat]:
+                    for back in backends[prov]:
+                        for bench in benchmark_types:
+                            if alg == "deutsch_jozsa":
+                                for case in deutsch_jozsa_cases:
+                                    yield Command(
+                                        num_qubits=qnum,
+                                        num_shots=num_shots,
+                                        algorithm=alg,
+                                        platform=plat,
+                                        provider=prov,
+                                        backend=back,
+                                        benchmark_type=bench,
+                                        deutsch_jozsa_case=case,
+                                    )
+                            else:
+                                yield Command(
+                                    num_qubits=qnum,
+                                    num_shots=num_shots,
+                                    algorithm=alg,
+                                    platform=plat,
+                                    provider=prov,
+                                    backend=back,
+                                    benchmark_type=bench,
+                                    deutsch_jozsa_case=None,
+                                )
