@@ -1,4 +1,5 @@
 from pathlib import Path
+import supported
 
 
 class Command:
@@ -10,22 +11,20 @@ class Command:
         platform: str,
         provider: str,
         backend: str,
-        benchmark: str,
+        benchmark_type: str,
         deutsch_jozsa_case: str,
     ) -> None:
         self.num_qubits = num_qubits
         self.num_shots = num_shots
-        self.algorithm = algorithm
-        self.platform = platform
-        self.benchmark = benchmark
+        self.algorithm = self._check_support(algorithm, supported.algorithms)
+        self.platform = self._check_support(platform, supported.platforms)
+        self.benchmark_type = self._check_support(benchmark_type, supported.benchmarks)
+        self.provider = self._check_support(
+            provider, supported.providers[self.platform]
+        )
+        self.backend = self._check_support(backend, supported.backends[self.provider])
 
         self.path = str(Path(self.platform) / self.algorithm) + ".py"
-
-        if self.platform == "Qiskit":
-            self.provider = provider
-            self.backend = backend
-        else:
-            raise NotImplementedError
 
         self.output = [
             "python",
@@ -43,10 +42,45 @@ class Command:
             "--backend",
             f"{self.backend}",
             "--benchmark",
-            f"{self.benchmark}",
+            f"{self.benchmark_type}",
         ]
 
         if self.algorithm == "deutsch_jozsa":
-            self.deutsch_jozsa_case = deutsch_jozsa_case
+            if deutsch_jozsa_case is not None:
+                self.deutsch_jozsa_case = deutsch_jozsa_case
+                self.output += ["--deutsch_jozsa_case", f"{self.deutsch_jozsa_case}"]
+            else:
+                raise ValueError(
+                    "If algorithm is Deutsch-Jozsa, case must be specified!"
+                )
 
-            self.output += ["--deutsch_jozsa_case", f"{self.deutsch_jozsa_case}"]
+    def _check_support(self, item, supported):
+        if item not in supported:
+            raise NotImplementedError(
+                f"{item} is not implemented yet! Please choose from {supported}"
+            )
+        else:
+            return item
+
+
+def command_generator(
+    max_num_qubits: int,
+    num_shots: int,
+    algorithm: str,
+    platform: str,
+    provider: str,
+    backend: str,
+    benchmark_type: str,
+    deutsch_jozsa_case: str,
+):
+    for qnum in range(3, max_num_qubits + 1):
+        yield Command(
+            num_qubits=qnum,
+            num_shots=num_shots,
+            algorithm=algorithm,
+            platform=platform,
+            provider=provider,
+            backend=backend,
+            benchmark_type=benchmark_type,
+            deutsch_jozsa_case=deutsch_jozsa_case,
+        )
