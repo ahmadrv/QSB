@@ -37,7 +37,7 @@ def run(
     provider,
     backend,
     benchmark_type,
-    deutsch_jozsa_case,
+    deutsch_jozsa_case=None,
 ):
     commands = command.command_generator(
         max_num_qubits,
@@ -47,7 +47,7 @@ def run(
         provider,
         backend,
         benchmark_type,
-        deutsch_jozsa_case,
+        deutsch_jozsa_case,     # [ ]: Use decorators for every algorithm to check if case is needed
     )
 
     file_header = f"qubit,{benchmark_type}"

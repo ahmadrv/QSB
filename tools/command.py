@@ -47,7 +47,9 @@ class Command:
 
         if self.algorithm == "deutsch_jozsa":
             if deutsch_jozsa_case is not None:
-                self.deutsch_jozsa_case = deutsch_jozsa_case
+                self.deutsch_jozsa_case = self._check_support(
+                    deutsch_jozsa_case, supported.deutsch_jozsa_cases
+                )
                 self.output += ["--deutsch_jozsa_case", f"{self.deutsch_jozsa_case}"]
             else:
                 raise ValueError(
