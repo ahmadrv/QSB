@@ -47,7 +47,7 @@ def run(
         provider,
         backend,
         benchmark_type,
-        deutsch_jozsa_case,     # [ ]: Use decorators for every algorithm to check if case is needed
+        deutsch_jozsa_case,     # [ ]: Use more general case for all algorithms
     )
 
     file_header = f"qubit,{benchmark_type}"
