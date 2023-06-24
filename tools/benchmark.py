@@ -1,4 +1,4 @@
-import subprocess, time, psutil
+import subprocess, time, psutil, command, result
 
 
 def runtime(*args) -> float:
@@ -27,3 +27,43 @@ def memory_usage(*args) -> float:
                 max_memory_usage = memory_usage
 
         return max_memory_usage / 1048576  # Convert to megabytes
+
+
+def run(
+    max_num_qubits,
+    num_shots,
+    algorithm,
+    platform,
+    provider,
+    backend,
+    benchmark_type,
+    deutsch_jozsa_case,
+):
+    commands = command.command_generator(
+        max_num_qubits,
+        num_shots,
+        algorithm,
+        platform,
+        provider,
+        backend,
+        benchmark_type,
+        deutsch_jozsa_case,
+    )
+
+    file_header = f"qubit,{benchmark_type}"
+    file_name = (
+        f"{platform}-{algorithm}-{provider}-{backend}-{benchmark_type}-{deutsch_jozsa_case}-"
+        + time.strftime("%Y%m%d_%H%M%S")
+        + ".csv"
+    )
+
+    result.make_csv_with_header("results/" + file_name, file_header)
+
+    for cmd in commands:
+        if benchmark_type == 'runtime':
+            output = f"{cmd.num_qubits},{runtime(*cmd.output)}"
+        elif benchmark_type == 'memory_usage':
+            output = f"{cmd.num_qubits},{memory_usage(*cmd.output)}"
+        result.add_result_to_file(output, "results/" + file_name)
+    
+    return file_name
