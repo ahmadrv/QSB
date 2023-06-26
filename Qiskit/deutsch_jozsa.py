@@ -76,3 +76,5 @@ if __name__ == "__main__":
     transpiled_circuit = transpile(circuit, backend)
 
     backend.run(transpiled_circuit, shots=args.num_shots)
+    
+    # [ ]: Print results to pass outputs to the parent on the subprocess

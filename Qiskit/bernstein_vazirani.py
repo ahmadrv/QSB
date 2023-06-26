@@ -48,10 +48,12 @@ def bv_algorithm(oracle: QuantumCircuit, n: int) -> QuantumCircuit:
 
 if __name__ == "__main__":
     oracle_gate = bv_oracle(args.num_qubits)
-    circuit = bv_algorithm(args.num_qubits)
+    circuit = bv_algorithm(oracle_gate, args.num_qubits)
     
     backend = get_backend(args.provider, args.backend)
     
     transpiled_circuit = transpile(circuit, backend)
     
     backend.run(transpiled_circuit, shots=args.num_shots)
+    
+    # [ ]: Print results to pass outputs to the parent on the subprocess

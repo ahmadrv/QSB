@@ -3,7 +3,7 @@
 """
 
 
-algorithms = ["deutsch_jozsa", "bernstain_vazirani"]  # [ ]: Add more algorithms here
+algorithms = ["deutsch_jozsa", "bernstein_vazirani"]  # [ ]: Add more algorithms here
 
 platforms = ["Qiskit"]
 
