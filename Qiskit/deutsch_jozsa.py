@@ -2,9 +2,10 @@ from qiskit import QuantumCircuit, transpile
 from provider import get_backend
 from interface import args
 import numpy as np
+import random
 
 
-def dj_oracle(case: str, n: int) -> QuantumCircuit:
+def dj_oracle(n: int) -> QuantumCircuit:
     """
     This function creates a Deutsch-Jozsa oracle based on the input case and
     input qubit size n. The oracle is a black box function that takes n qubits
@@ -14,18 +15,21 @@ def dj_oracle(case: str, n: int) -> QuantumCircuit:
     """
     oracle_qc = QuantumCircuit(n + 1)
 
+    cases = ["constant", "balanced"]
+
+    case = random.choice(cases)
+
     if case == "balanced":
         b = np.random.randint(1, 2**n)
-
         b_str = format(b, "0" + str(n) + "b")
-
+        
         for qubit in range(len(b_str)):
             if b_str[qubit] == "1":
                 oracle_qc.x(qubit)
-
+                
         for qubit in range(n):
             oracle_qc.cx(qubit, n)
-
+            
         for qubit in range(len(b_str)):
             if b_str[qubit] == "1":
                 oracle_qc.x(qubit)
@@ -64,11 +68,11 @@ def dj_algorithm(oracle: QuantumCircuit, n: int) -> QuantumCircuit:
 
 
 if __name__ == "__main__":
-    oracle_gate = dj_oracle(args.deutsch_jozsa_case, args.num_qubits)
+    oracle_gate = dj_oracle(args.num_qubits)
     circuit = dj_algorithm(oracle_gate, args.num_qubits)
 
     backend = get_backend(args.provider, args.backend)
 
     transpiled_circuit = transpile(circuit, backend)
 
-    backend.run(transpiled_circuit)
+    backend.run(transpiled_circuit, shots=args.num_shots)

@@ -30,40 +30,36 @@ def memory_usage(*args) -> float:
 
 
 def run(
-    max_num_qubits,
+    num_qubits,
     num_shots,
     algorithm,
     platform,
     provider,
     backend,
-    benchmark_type,
-    deutsch_jozsa_case=None,
+    benchmarks,
 ):
     commands = command.command_generator(
-        max_num_qubits,
+        num_qubits,
         num_shots,
         algorithm,
         platform,
         provider,
         backend,
-        benchmark_type,
-        deutsch_jozsa_case,     # [ ]: Use more general case for all algorithms
+        benchmarks,
     )
-
-    file_header = f"qubit,{benchmark_type}"
-    file_name = (
-        f"{platform}-{algorithm}-{provider}-{backend}-{benchmark_type}-{deutsch_jozsa_case}-"
-        + time.strftime("%Y%m%d_%H%M%S")
-        + ".csv"
-    )
-
-    result.make_csv_with_header("results/" + file_name, file_header)
 
     for cmd in commands:
-        if benchmark_type == 'runtime':
+        file_path = (
+            f"results/{cmd.platform}/{cmd.provider}/{cmd.backend}/"
+            f"{cmd.algorithm}/{cmd.benchmark_type}/{cmd.num_shots} shots.csv"
+        )
+
+        result.make_csv_with_header(file_path, f"qubit,{cmd.benchmark_type}")
+
+        if cmd.benchmark_type == "runtime":
             output = f"{cmd.num_qubits},{runtime(*cmd.output)}"
-        elif benchmark_type == 'memory_usage':
+
+        elif cmd.benchmark_type == "memory_usage":
             output = f"{cmd.num_qubits},{memory_usage(*cmd.output)}"
-        result.add_result_to_file(output, "results/" + file_name)
-    
-    return file_name
+
+        result.add_result_to_file(output, file_path)

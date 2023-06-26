@@ -12,7 +12,6 @@ class Command:
         provider: str,
         backend: str,
         benchmark_type: str,
-        deutsch_jozsa_case: str,
     ) -> None:
         self.num_qubits = num_qubits
         self.num_shots = num_shots
@@ -33,96 +32,44 @@ class Command:
             f"{self.num_qubits}",
             "--num_shots",
             f"{self.num_shots}",
-            "--algorithm",
-            f"{self.algorithm}",
-            "--platform",
-            f"{self.platform}",
             "--provider",
             f"{self.provider}",
             "--backend",
             f"{self.backend}",
-            "--benchmark",
-            f"{self.benchmark_type}",
         ]
-
-        if self.algorithm == "deutsch_jozsa":
-            if deutsch_jozsa_case is not None:
-                self.deutsch_jozsa_case = self._check_support(
-                    deutsch_jozsa_case, supported.deutsch_jozsa_cases
-                )
-                self.output += ["--deutsch_jozsa_case", f"{self.deutsch_jozsa_case}"]
-            else:
-                raise ValueError(
-                    "If algorithm is Deutsch-Jozsa, case must be specified!"
-                )
 
     def _check_support(self, item, supported):
         if item not in supported:
             raise NotImplementedError(
-                f"{item} is not implemented yet! Please choose from {supported}"
+                f"{item} is not implemented yet or wrong case is selected!\
+                    Please choose from {supported}"
             )
         else:
             return item
 
 
 def command_generator(
-    max_num_qubits: int,
-    num_shots: int,
-    algorithm: str,
-    platform: str,
-    provider: str,
-    backend: str,
-    benchmark_type: str,
-    deutsch_jozsa_case: str,
+    num_qubits: list[int],
+    num_shots: list[int],
+    algorithms: list[str],
+    platforms: list[str],
+    providers: list[str],
+    backends: list[str],
+    benchmarks: list[str],
 ):
-    for qnum in range(3, max_num_qubits + 1):
-        yield Command(
-            num_qubits=qnum,
-            num_shots=num_shots,
-            algorithm=algorithm,
-            platform=platform,
-            provider=provider,
-            backend=backend,
-            benchmark_type=benchmark_type,
-            deutsch_jozsa_case=deutsch_jozsa_case,
-        )
-
-def general_command_generator(
-    max_num_qubits: int,
-    num_shots: int,
-    algorithms: list,
-    platforms: list,
-    providers: list,
-    backends: list,
-    benchmark_types: list,
-    deutsch_jozsa_cases: list,
-):
-    for qnum in range(3, max_num_qubits + 1):
-        for alg in algorithms:
-            for plat in platforms:
-                for prov in providers[plat]:
-                    for back in backends[prov]:
-                        for bench in benchmark_types:
-                            if alg == "deutsch_jozsa":
-                                for case in deutsch_jozsa_cases:
-                                    yield Command(
-                                        num_qubits=qnum,
-                                        num_shots=num_shots,
-                                        algorithm=alg,
-                                        platform=plat,
-                                        provider=prov,
-                                        backend=back,
-                                        benchmark_type=bench,
-                                        deutsch_jozsa_case=case,
-                                    )
-                            else:
+    for qnum in num_qubits:
+        for snum in num_shots:
+            for alg in algorithms:
+                for plat in platforms:
+                    for prov in providers:
+                        for back in backends:
+                            for bench in benchmarks:
                                 yield Command(
                                     num_qubits=qnum,
-                                    num_shots=num_shots,
+                                    num_shots=snum,
                                     algorithm=alg,
                                     platform=plat,
                                     provider=prov,
                                     backend=back,
                                     benchmark_type=bench,
-                                    deutsch_jozsa_case=None,
                                 )

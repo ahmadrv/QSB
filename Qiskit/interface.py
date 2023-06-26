@@ -16,19 +16,6 @@ parser.add_argument(
     help="The number of shots that the simulator will simulate.",
 )
 
-parser.add_argument(
-    "--algorithm",
-    type=str,
-    help="The algorithm that it should be 'deutsch_jozsa', 'grover' or ... .",
-    # [ ]: Add other algorithms.
-)
-
-parser.add_argument(
-    "--platform",
-    type=str,
-    help="The platform that it should be 'qiskit', 'qulacs' or ... .",
-    # [ ]: Add other platforms.
-)
 
 parser.add_argument(
     "--provider",
@@ -43,26 +30,5 @@ parser.add_argument(
     help="The backend that it should be 'qasm_simulator', 'statevector_simulator' or ... .",
     # [ ]: Add other backends.
 )
-
-parser.add_argument(
-    "--benchmark",
-    type=str,
-    help="The benchmark type that it should be 'runtime', 'memory_usage' or ... .",
-    # [ ]: Add other benchmarks.
-)
-
-args, additional_args = parser.parse_known_args()
-
-
-if args.algorithm == "deutsch_jozsa":
-    
-    parser.add_argument(
-    "--deutsch_jozsa_case",
-    type=str,
-    help="The Deutsch-Jozsa case that it should be 'balanced' or 'constant'.",
-    )
-
-elif args.algorithm == "grover":
-    pass
 
 args, additional_args = parser.parse_known_args()   # This line should be the last line of this file.
