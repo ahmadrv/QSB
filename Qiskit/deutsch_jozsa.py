@@ -4,6 +4,12 @@ from interface import args
 import numpy as np
 import random
 
+def generate_balanced_binary(n):
+    binary_number = ['0', '1'] * (n // 2)
+    if n % 2 != 0:
+        binary_number.append(str(random.choice([0, 1])))
+    random.shuffle(binary_number)
+    return ''.join(binary_number)
 
 def dj_oracle(n: int) -> QuantumCircuit:
     """
@@ -20,8 +26,7 @@ def dj_oracle(n: int) -> QuantumCircuit:
     case = random.choice(cases)
 
     if case == "balanced":
-        b = np.random.randint(1, 2**n)
-        b_str = format(b, "0" + str(n) + "b")
+        b_str = generate_balanced_binary(n)
         
         for qubit in range(len(b_str)):
             if b_str[qubit] == "1":
@@ -75,6 +80,6 @@ if __name__ == "__main__":
 
     transpiled_circuit = transpile(circuit, backend)
 
-    backend.run(transpiled_circuit, shots=args.num_shots)
+    backend.run(transpiled_circuit, shots=args.num_shots).result()      # [ ]: add result() based on https://github.com/Qiskit/qiskit-aer/issues/1210
     
     # [ ]: Print results to pass outputs to the parent on the subprocess

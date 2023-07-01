@@ -27,26 +27,29 @@ def add_result_to_file(result, file_path):
     with open(file_path, "a") as f:
         f.write(result + "\n")
 
+
 def plot_result(file_paths, benchmark):
-    
-    plt.figure(figsize=(20, 10))
-    
-    for file_path in file_paths:
+    fig = plt.figure(figsize=(30, 20))
+    ax = fig.add_subplot(projection="3d")
+
+    for idx, file_path in enumerate(file_paths):
         df = pd.read_csv(file_path)
         df_mean = df.groupby("qubit", as_index=False).mean()
-        
-        plt.plot(df_mean["qubit"], df_mean[benchmark], label=file_path)
-    
-    plt.xlabel("Number of Qubit")
-    plt.ylabel(benchmark)
+
+        ax.plot(df_mean["qubit"], df_mean[benchmark], zs=idx, zdir="y", label=file_path)
+
+    ax.set_xlabel("Number of qubit")
+    ax.set_ylabel("Simulators")
+    ax.set_zlabel(benchmark)
     plt.legend()
     plt.show()
 
+
 def get_all_files(directory):
     file_list = []
-    
-    for root, dirs, files in os.walk(directory):
+
+    for root, ـ, files in os.walk(directory):
         for file in files:
             file_list.append(os.path.join(root, file))
-    
+
     return file_list
