@@ -1,7 +1,12 @@
 import matplotlib.pyplot as plt
+from matplotlib import rcParams
 from pathlib import Path
 import pandas as pd
 import os
+
+rcParams['font.family'] = 'serif'
+rcParams['font.style'] = 'normal'
+rcParams['text.usetex'] = True
 
 # [ ]: Make this module more efficient!!!
 
@@ -30,7 +35,7 @@ def add_result_to_file(result, file_path):
 
 def plot_result(file_paths, benchmark):
     fig = plt.figure(figsize=(30, 20))
-    ax = fig.add_subplot(projection="3d")
+    ax = fig.add_subplot(111, projection="3d")
 
     for idx, file_path in enumerate(file_paths):
         df = pd.read_csv(file_path)
@@ -41,7 +46,7 @@ def plot_result(file_paths, benchmark):
     ax.set_xlabel("Number of qubit")
     ax.set_ylabel("Simulators")
     ax.set_zlabel(benchmark)
-    plt.legend()
+    ax.legend()
     plt.show()
 
 
