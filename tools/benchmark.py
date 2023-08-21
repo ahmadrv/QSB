@@ -51,7 +51,7 @@ def run(
     for cmd in commands:
         file_path = (
             f"results/{cmd.platform}/{cmd.provider}/{cmd.backend}/"
-            f"{cmd.algorithm}/{cmd.benchmark_type}/{cmd.num_shots} shots.csv"
+            f"{cmd.algorithm}/{cmd.benchmark_type}/{cmd.num_shots}shots.csv"
         )
 
         result.make_csv_with_header(file_path, f"qubit,{cmd.benchmark_type}")

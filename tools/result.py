@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
+import plotly.graph_objects as go
 from pathlib import Path
 import pandas as pd
 import os
@@ -48,6 +49,37 @@ def plot_result(file_paths, benchmark):
     ax.set_zlabel(benchmark)
     ax.legend()
     plt.show()
+
+def plot_result_plotly(file_paths, benchmark):
+    fig = go.Figure()
+
+    for idx, file_path in enumerate(file_paths):
+        df = pd.read_csv(file_path)
+        df_mean = df.groupby("qubit").mean().reset_index()
+
+        fig.add_trace(
+            go.Scatter3d(
+                x=df_mean["qubit"],
+                y=[idx] * len(df_mean),
+                z=df_mean[benchmark],
+                mode="lines",
+                name=file_path
+            )
+        )
+
+    fig.update_layout(
+        scene=dict(
+            xaxis=dict(title="Number of qubits"),
+            yaxis=dict(title="Simulators"),
+            zaxis=dict(title=benchmark),
+        ),
+        showlegend=False, # legend=dict(title="File Paths"),
+        width=800,
+        height=600,
+    )
+
+    fig.show()
+
 
 
 def get_all_files(directory):
