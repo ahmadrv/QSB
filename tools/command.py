@@ -1,5 +1,6 @@
 from pathlib import Path
 import supported
+import itertools
 
 
 class Command:
@@ -57,19 +58,21 @@ def command_generator(
     backends: list[str],
     benchmarks: list[str],
 ):
-    for qnum in num_qubits:
-        for snum in num_shots:
-            for alg in algorithms:
-                for plat in platforms:
-                    for prov in providers:
-                        for back in backends:
-                            for bench in benchmarks:
-                                yield Command(
-                                    num_qubits=qnum,
-                                    num_shots=snum,
-                                    algorithm=alg,
-                                    platform=plat,
-                                    provider=prov,
-                                    backend=back,
-                                    benchmark_type=bench,
-                                )
+    combinations_args = itertools.product(num_qubits,
+                                          num_shots,
+                                          algorithms,
+                                          platforms,
+                                          providers,
+                                          backends,
+                                          benchmarks)
+    
+    for qnum, snum, alg, plat, prov, back, bench in combinations_args:
+        yield Command(
+            num_qubits=qnum,
+            num_shots=snum,
+            algorithm=alg,
+            platform=plat,
+            provider=prov,
+            backend=back,
+            benchmark_type=bench,
+        )
