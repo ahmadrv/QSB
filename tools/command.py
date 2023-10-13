@@ -4,6 +4,32 @@ import itertools
 
 
 class Command:
+    """
+    A class representing a command to be executed.
+
+    Attributes:
+    -----------
+    num_qubits : int
+        The number of qubits to be used in the algorithm.
+    num_shots : int
+        The number of times the circuit is run to get the measurement statistics.
+    algorithm : str
+        The name of the algorithm to be executed.
+    platform : str
+        The name of the platform to be used for the execution.
+    provider : str
+        The name of the provider to be used for the execution.
+    backend : str
+        The name of the backend to be used for the execution.
+    benchmark_type : str
+        The type of benchmark to be executed.
+
+    Methods:
+    --------
+    _check_support(item: str, supported: list[str]) -> str
+        A private method to check if the given item is supported or not.
+
+    """
     def __init__(
         self,
         num_qubits: int,
@@ -39,7 +65,27 @@ class Command:
             f"{self.backend}",
         ]
 
-    def _check_support(self, item, supported):
+    def _check_support(self, item: str, supported: list[str]) -> str:
+        """
+        A private method to check if the given item is supported or not.
+
+        Parameters:
+        -----------
+        item : str
+            The item to be checked for support.
+        supported : list[str]
+            A list of supported items.
+
+        Returns:
+        --------
+        str
+            The item if it is supported.
+
+        Raises:
+        -------
+        NotImplementedError
+            If the item is not supported.
+        """
         if item not in supported:
             raise NotImplementedError(
                 f"{item} is not implemented yet or wrong case is selected!\
@@ -48,6 +94,8 @@ class Command:
         else:
             return item
 
+
+import itertools
 
 def command_generator(
     num_qubits: list[int],
@@ -58,6 +106,21 @@ def command_generator(
     backends: list[str],
     benchmarks: list[str],
 ):
+    """
+    Generate a command object for each combination of input parameters.
+
+    Args:
+        num_qubits (list[int]): List of integers representing the number of qubits.
+        num_shots (list[int]): List of integers representing the number of shots.
+        algorithms (list[str]): List of strings representing the algorithm names.
+        platforms (list[str]): List of strings representing the platform names.
+        providers (list[str]): List of strings representing the provider names.
+        backends (list[str]): List of strings representing the backend names.
+        benchmarks (list[str]): List of strings representing the benchmark types.
+
+    Yields:
+        Command: A command object with the given input parameters.
+    """
     combinations_args = itertools.product(num_qubits,
                                           num_shots,
                                           algorithms,
