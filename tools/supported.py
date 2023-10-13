@@ -1,9 +1,15 @@
 """
-[ ]: Add supported algorithms, platforms, providers, backends and benchmarks here.
+This module contains information about the supported algorithms, platforms, providers, backends, and benchmarks.
+
+Attributes:
+    algorithms (list): A list of supported algorithms.
+    platforms (list): A list of supported platforms.
+    providers (dict): A dictionary of supported providers and their corresponding backends.
+    backends (dict): A dictionary of supported backends and their corresponding simulators.
+    benchmarks (list): A list of supported benchmarks.
 """
 
-
-algorithms = ["deutsch_jozsa", "bernstein_vazirani"]  # [ ]: Add more algorithms here
+algorithms = ["deutsch_jozsa", "bernstein_vazirani"]
 
 platforms = ["Qiskit"]
 
@@ -11,7 +17,7 @@ providers = {"Qiskit": ["aer", "ddsim"]}
 
 backends = {
     "aer": [
-        "aer_simulator",  # ##
+        "aer_simulator",
         "aer_simulator_statevector",
         "aer_simulator_density_matrix",
         "aer_simulator_stabilizer",
@@ -19,14 +25,14 @@ backends = {
         "aer_simulator_extended_stabilizer",
         "aer_simulator_unitary",
         "aer_simulator_superop",
-        "qasm_simulator",  # ##
+        "qasm_simulator",
         "statevector_simulator",
         "unitary_simulator",
         "pulse_simulator",
     ],
     "ddsim": [
-        "qasm_simulator",  ###
-        "statevector_simulator",  ###
+        "qasm_simulator",  
+        "statevector_simulator",
         "hybrid_qasm_simulator",
         "hybrid_statevector_simulator",
         "path_sim_qasm_simulator",
@@ -35,4 +41,4 @@ backends = {
     ],
 }
 
-benchmarks = ["runtime", "memory_usage"]  # runtime
+benchmarks = ["runtime", "memory_usage"]
