@@ -30,6 +30,7 @@ class Command:
         A private method to check if the given item is supported or not.
 
     """
+
     def __init__(
         self,
         num_qubits: int,
@@ -97,6 +98,7 @@ class Command:
 
 import itertools
 
+
 def command_generator(
     num_qubits: list[int],
     num_shots: list[int],
@@ -121,14 +123,10 @@ def command_generator(
     Yields:
         Command: A command object with the given input parameters.
     """
-    combinations_args = itertools.product(num_qubits,
-                                          num_shots,
-                                          algorithms,
-                                          platforms,
-                                          providers,
-                                          backends,
-                                          benchmarks)
-    
+    combinations_args = itertools.product(
+        num_qubits, num_shots, algorithms, platforms, providers, backends, benchmarks
+    )
+
     for qnum, snum, alg, plat, prov, back, bench in combinations_args:
         yield Command(
             num_qubits=qnum,

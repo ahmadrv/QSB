@@ -5,18 +5,12 @@ from pathlib import Path
 import pandas as pd
 import os
 
-rcParams['font.family'] = 'serif'
-rcParams['font.style'] = 'normal'
-rcParams['text.usetex'] = True
-
-# [ ]: Make this module more efficient!!!
+rcParams["font.family"] = "serif"
+rcParams["font.style"] = "normal"
+rcParams["text.usetex"] = True
 
 
 def make_csv_with_header(file_path, header):
-    """
-    This method makes a csv file with header.
-    """
-
     directory = os.path.dirname(file_path)
 
     if not os.path.exists(directory):
@@ -26,10 +20,6 @@ def make_csv_with_header(file_path, header):
 
 
 def add_result_to_file(result, file_path):
-    """
-    This method adds the result to the file.
-    """
-
     with open(file_path, "a") as f:
         f.write(result + "\n")
 
@@ -50,6 +40,7 @@ def plot_result(file_paths, benchmark):
     ax.legend()
     plt.show()
 
+
 def plot_result_plotly(file_paths, benchmark):
     fig = go.Figure()
 
@@ -63,7 +54,7 @@ def plot_result_plotly(file_paths, benchmark):
                 y=[idx] * len(df_mean),
                 z=df_mean[benchmark],
                 mode="lines",
-                name=file_path
+                name=file_path,
             )
         )
 
@@ -73,13 +64,12 @@ def plot_result_plotly(file_paths, benchmark):
             yaxis=dict(title="Simulators"),
             zaxis=dict(title=benchmark),
         ),
-        showlegend=False, # legend=dict(title="File Paths"),
+        showlegend=False,  # legend=dict(title="File Paths"),
         width=800,
         height=600,
     )
 
     fig.show()
-
 
 
 def get_all_files(directory):

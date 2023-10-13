@@ -65,7 +65,7 @@ def run(
     Returns:
         None
     """
-   
+
     commands = command.command_generator(
         num_qubits,
         num_shots,

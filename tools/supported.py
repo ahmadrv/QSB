@@ -31,7 +31,7 @@ backends = {
         "pulse_simulator",
     ],
     "ddsim": [
-        "qasm_simulator",  
+        "qasm_simulator",
         "statevector_simulator",
         "hybrid_qasm_simulator",
         "hybrid_statevector_simulator",
