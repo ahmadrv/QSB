@@ -40,7 +40,7 @@ def add_result_to_file(result: str, file_path: str):
         f.write(result + "\n")
 
 
-def plot_result(file_paths: list[str], benchmark: str):
+def plot_result(file_paths: list[str], benchmark: str, z_axis_label: str):
     """
     Plots the benchmark results for different simulators and qubit numbers.
 
@@ -62,7 +62,7 @@ def plot_result(file_paths: list[str], benchmark: str):
 
     ax.set_xlabel("Number of qubit")
     ax.set_ylabel("Simulators")
-    ax.set_zlabel(benchmark)
+    ax.set_zlabel(z_axis_label)
     ax.legend()
     plt.show()
 
@@ -119,10 +119,13 @@ def get_all_files(directory: str) -> list[str]:
     Returns:
         list: A list of file paths.
     """
-    file_list = []
+    runtime_file_list = []
+    memory_usage_file_list = []
 
     for root, ـ, files in os.walk(directory):
         for file in files:
-            file_list.append(os.path.join(root, file))
-
-    return file_list
+            if 'runtime' in os.path.join(root, file):
+                runtime_file_list.append(os.path.join(root, file))
+            elif 'memory_usage' in os.path.join(root, file):
+                memory_usage_file_list.append(os.path.join(root, file))
+    return runtime_file_list, memory_usage_file_list
