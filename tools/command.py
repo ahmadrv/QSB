@@ -49,7 +49,7 @@ class Command:
         self.provider = self._check_support(
             provider, supported.providers[self.platform]
         )
-        self.backend = self._check_support(backend, supported.backends[self.provider])
+        self.backend = self._check_support(backend, supported.backends[self.provider], self.provider)
 
         self.path = str(Path(self.platform) / self.algorithm) + ".py"
 
@@ -66,7 +66,7 @@ class Command:
             f"{self.backend}",
         ]
 
-    def _check_support(self, item: str, supported: list[str]) -> str:
+    def _check_support(self, item: str, supported: list[str], detail: str = None) -> str:
         """
         A private method to check if the given item is supported or not.
 
@@ -88,15 +88,19 @@ class Command:
             If the item is not supported.
         """
         if item not in supported:
-            raise NotImplementedError(
-                f"{item} is not implemented yet or wrong case is selected!\
-                    Please choose from {supported}"
+            if detail is not None:
+                raise NotImplementedError(
+                f"{item} is not implemented yet or wrong case is selected for {detail}! "
+                + f"Please choose from {supported}"
             )
+                
+            raise NotImplementedError(
+                f"{item} is not implemented yet or wrong case is selected! "
+                + f"Please choose from {supported}"
+            )
+    
         else:
             return item
-
-
-import itertools
 
 
 def command_generator(
@@ -128,12 +132,17 @@ def command_generator(
     )
 
     for qnum, snum, alg, plat, prov, back, bench in combinations_args:
-        yield Command(
-            num_qubits=qnum,
-            num_shots=snum,
-            algorithm=alg,
-            platform=plat,
-            provider=prov,
-            backend=back,
-            benchmark_type=bench,
-        )
+        try:
+            yield Command(
+                num_qubits=qnum,
+                num_shots=snum,
+                algorithm=alg,
+                platform=plat,
+                provider=prov,
+                backend=back,
+                benchmark_type=bench,
+            )
+        except NotImplementedError as NIE:
+            print(NIE)
+        except Exception as e:
+            print(e)
