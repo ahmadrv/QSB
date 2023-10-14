@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
 import plotly.graph_objects as go
-from pathlib import Path
 import pandas as pd
 import os
 
