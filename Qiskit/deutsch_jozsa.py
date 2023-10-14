@@ -80,6 +80,6 @@ if __name__ == "__main__":
 
     transpiled_circuit = transpile(circuit, backend)
 
-    backend.run(transpiled_circuit, shots=args.num_shots).result()      # [ ]: add result() based on https://github.com/Qiskit/qiskit-aer/issues/1210
+    backend.run(transpiled_circuit, shots=args.num_shots).result()      # [x]: add result() based on https://github.com/Qiskit/qiskit-aer/issues/1210
     
     # [ ]: Print results to pass outputs to the parent on the subprocess
