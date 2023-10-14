@@ -10,7 +10,17 @@ rcParams["font.style"] = "normal"
 rcParams["text.usetex"] = True
 
 
-def make_csv_with_header(file_path, header):
+def make_csv_with_header(file_path: str, header: str):
+    """
+    Creates a new CSV file with the given file path and header.
+
+    Args:
+        file_path (str): The file path where the CSV file will be created.
+        header (str): The header row for the CSV file.
+
+    Returns:
+        None
+    """
     directory = os.path.dirname(file_path)
 
     if not os.path.exists(directory):
@@ -19,12 +29,29 @@ def make_csv_with_header(file_path, header):
             f.write(header + "\n")
 
 
-def add_result_to_file(result, file_path):
+def add_result_to_file(result: str, file_path: str):
+    """
+    Appends the given result to the file at the specified file path.
+
+    Args:
+        result (str): The result to be added to the file.
+        file_path (str): The path to the file to which the result should be added.
+    """
     with open(file_path, "a") as f:
         f.write(result + "\n")
 
 
-def plot_result(file_paths, benchmark):
+def plot_result(file_paths: list[str], benchmark: str):
+    """
+    Plots the benchmark results for different simulators and qubit numbers.
+
+    Args:
+    - file_paths (list): A list of file paths containing the benchmark results.
+    - benchmark (str): The name of the benchmark to plot.
+
+    Returns:
+    - None
+    """
     fig = plt.figure(figsize=(30, 20))
     ax = fig.add_subplot(111, projection="3d")
 
@@ -41,7 +68,17 @@ def plot_result(file_paths, benchmark):
     plt.show()
 
 
-def plot_result_plotly(file_paths, benchmark):
+def plot_result_plotly(file_paths: list[str], benchmark: str):
+    """
+    Plots a 3D scatter plot using Plotly for the given file paths and benchmark.
+
+    Args:
+        file_paths (list[str]): A list of file paths containing the data to be plotted.
+        benchmark (str): The name of the benchmark to be plotted.
+
+    Returns:
+        None
+    """
     fig = go.Figure()
 
     for idx, file_path in enumerate(file_paths):
@@ -64,7 +101,8 @@ def plot_result_plotly(file_paths, benchmark):
             yaxis=dict(title="Simulators"),
             zaxis=dict(title=benchmark),
         ),
-        showlegend=False,  # legend=dict(title="File Paths"),
+        showlegend=False,
+        legend=dict(title="File Paths"),
         width=800,
         height=600,
     )
@@ -72,7 +110,16 @@ def plot_result_plotly(file_paths, benchmark):
     fig.show()
 
 
-def get_all_files(directory):
+def get_all_files(directory: str) -> list[str]:
+    """
+    Returns a list of all files in the given directory and its subdirectories.
+
+    Args:
+        directory (str): The directory to search for files.
+
+    Returns:
+        list: A list of file paths.
+    """
     file_list = []
 
     for root, ـ, files in os.walk(directory):
