@@ -13,8 +13,6 @@ def main(qubit_count=8):
     secret_bias_bit = random.randint(0, 1)
     secret_factor_bits = [random.randint(0, 1) for _ in range(qubit_count)]
     oracle = make_oracle(input_qubits, output_qubit, secret_factor_bits, secret_bias_bit)
-      
-    start_time = time.time()
 
     # Embed the oracle into a special quantum circuit querying it exactly once.
     circuit = make_bernstein_vazirani_circuit(input_qubits, output_qubit, oracle)
@@ -24,12 +22,8 @@ def main(qubit_count=8):
     result = simulator.run(circuit, repetitions=circuit_sample_count)
     frequencies = result.histogram(key='result', fold_func=bitstring)
     
-    end_time = time.time()
-    
     # Check if we actually found the secret value.
     most_common_bitstring = frequencies.most_common(1)[0][0]
-    
-    print(f'Time(s) :{end_time - start_time}, #Q: {qubit_count}, Check: {most_common_bitstring == bitstring(secret_factor_bits)}')
   
 
 def make_oracle(input_qubits, output_qubit, secret_factor_bits, secret_bias_bit):

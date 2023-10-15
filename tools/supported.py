@@ -19,7 +19,8 @@ backends = {                           # [ ]: The correspond algorithm for comme
     "aer": [
         "aer_simulator",
         "qasm_simulator",
-        # "statevector_simulator",
+        "aer_simulator_density_matrix",
+        # "statevector_simulator",      # [ ]: 
         # "unitary_simulator",
         # "pulse_simulator",
     ],
