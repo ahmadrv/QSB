@@ -1,4 +1,4 @@
-# **TODOs**
+# **ToDos**
 
 - [x] Test new time checkpoints.
 - [x] Follow up the papers that published by MQT research group.
