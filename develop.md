@@ -4,9 +4,14 @@
   - [x] Deutsch-Jozsa
   - [x] Bernstain-Vazirani
   - [ ] Simon
-  - [ ] Grover
   - [ ] QFT
-  - [ ] ...
+  - [ ] Quantum Phase Estimation
+  - [ ] Shor
+  - [ ] Grover
+  - [ ] Quantum Counting
+  - [ ] Quantum Walk Search
+  - [ ] Superdence Coding
+  - [ ] Quantum teleportation
 - Simulators
   - [x] Qiskit
     - [x] Aer
