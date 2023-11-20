@@ -1,6 +1,6 @@
 from qiskit import QuantumCircuit, transpile
-from provider import get_backend
-from interface import args
+from tools.provider import get_backend
+from tools.interface import args
 import numpy as np
 import random
 
