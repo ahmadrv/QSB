@@ -1,85 +1,99 @@
 from qiskit import QuantumCircuit, transpile
+
 from tools.provider import get_backend
 from tools.interface import args
+
 import numpy as np
 import random
 
-def generate_balanced_binary(n):
-    binary_number = ['0', '1'] * (n // 2)
+
+def main():
+    """
+    Main function that executes the Deutsch-Jozsa algorithm.
+    """
+    oracle_gate = deutsch_jozsa_oracle(args.num_qubits)
+    circuit = deutsch_jozsa_algorithm(oracle_gate, args.num_qubits)
+    backend = get_backend(args.provider, args.backend)
+    transpiled_circuit = transpile(circuit, backend)
+    backend.run(transpiled_circuit, shots=args.num_shots).result()
+
+
+def generate_balanced_binary(n: int) -> str:
+    """
+    Generates a balanced binary string of length n.
+
+    Args:
+        n (int): The length of the binary string.
+
+    Returns:
+        str: The generated balanced binary string.
+    """
+    binary_number = ["0", "1"] * (n // 2)
     if n % 2 != 0:
         binary_number.append(str(random.choice([0, 1])))
     random.shuffle(binary_number)
-    return ''.join(binary_number)
+    return "".join(binary_number)
 
-def dj_oracle(n: int) -> QuantumCircuit:
+
+def deutsch_jozsa_oracle(n: int) -> QuantumCircuit:
     """
-    This function creates a Deutsch-Jozsa oracle based on the input case and
-    input qubit size n. The oracle is a black box function that takes n qubits
-    as input and outputs 1 qubit. The oracle is either constant or balanced.
+    Creates a Deutsch-Jozsa oracle circuit.
 
-    return: a Deutsch-Jozsa oracle as a gate
+    Args:
+        n (int): The number of input qubits.
+
+    Returns:
+        QuantumCircuit: The Deutsch-Jozsa oracle circuit.
     """
-    oracle_qc = QuantumCircuit(n + 1)
-
+    qc = QuantumCircuit(n + 1)
     cases = ["constant", "balanced"]
-
     case = random.choice(cases)
 
     if case == "balanced":
         b_str = generate_balanced_binary(n)
-        
         for qubit in range(len(b_str)):
             if b_str[qubit] == "1":
-                oracle_qc.x(qubit)
-                
+                qc.x(qubit)
         for qubit in range(n):
-            oracle_qc.cx(qubit, n)
-            
+            qc.cx(qubit, n)
         for qubit in range(len(b_str)):
             if b_str[qubit] == "1":
-                oracle_qc.x(qubit)
+                qc.x(qubit)
 
     if case == "constant":
         output = np.random.randint(2)
         if output == 1:
-            oracle_qc.x(n)
+            qc.x(n)
 
-    oracle_gate = oracle_qc.to_gate()
+    oracle_gate = qc.to_gate()
     oracle_gate.name = "Oracle"
     return oracle_gate
 
 
-def dj_algorithm(oracle: QuantumCircuit, n: int) -> QuantumCircuit:
+def deutsch_jozsa_algorithm(oracle: QuantumCircuit, n: int) -> QuantumCircuit:
     """
-    This function creates a Deutsch-Jozsa algorithm based on the input oracle
-    and input qubit size n.
+    Implements the Deutsch-Jozsa algorithm.
+
+    Args:
+        oracle (QuantumCircuit): The oracle circuit representing the function f(x).
+        n (int): The number of qubits used in the algorithm.
+
+    Returns:
+        QuantumCircuit: The final quantum circuit after applying the Deutsch-Jozsa algorithm.
     """
-    dj_circuit = QuantumCircuit(n + 1, n)
-    dj_circuit.x(n)
-    dj_circuit.h(n)
+    qc = QuantumCircuit(n + 1, n)
+    
+    qc.x(n)
+    qc.h(n)
 
-    for qubit in range(n):
-        dj_circuit.h(qubit)
+    qc.h(range(n))
+    qc.append(oracle, range(n + 1))
+    qc.h(range(n))
 
-    dj_circuit.append(oracle, range(n + 1))
+    qc.measure(range(n), range(n))
 
-    for qubit in range(n):
-        dj_circuit.h(qubit)
-
-    for i in range(n):
-        dj_circuit.measure(i, i)
-
-    return dj_circuit
+    return qc
 
 
 if __name__ == "__main__":
-    oracle_gate = dj_oracle(args.num_qubits)
-    circuit = dj_algorithm(oracle_gate, args.num_qubits)
-
-    backend = get_backend(args.provider, args.backend)
-
-    transpiled_circuit = transpile(circuit, backend)
-
-    backend.run(transpiled_circuit, shots=args.num_shots).result()      # [x]: add result() based on https://github.com/Qiskit/qiskit-aer/issues/1210
-    
-    # [ ]: Print results to pass outputs to the parent on the subprocess
+    main()
