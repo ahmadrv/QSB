@@ -55,6 +55,7 @@ def bernstein_vazirani_algorithm(oracle: QuantumCircuit, n: int) -> QuantumCircu
         QuantumCircuit: The circuit implementing the Bernstein-Vazirani algorithm.
     """
     qc = QuantumCircuit(n + 1, n)
+    
     qc.h(n)
     qc.z(n)
 
