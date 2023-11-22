@@ -1,117 +1,90 @@
-# pylint: disable=wrong-or-nonexistent-copyright-notice
+from cirq import GridQubit, ControlledGate, Circuit, Simulator, measure, X, H
 
-"""Demonstrates the Bernstein-Vazirani algorithm.
+from tools.interface import args
 
-The (non-recursive) Bernstein-Vazirani algorithm takes a black-box oracle
-implementing a function f(a) = a·factors + bias (mod 2), where 'bias' is 0 or 1,
-'a' and 'factors' are vectors with all elements equal to 0 or 1, and the
-algorithm solves for 'factors' in a single query to the oracle.
-
-=== REFERENCE ===
-
-Bernstein, Ethan, and Umesh Vazirani. "Quantum complexity theory."
-SIAM Journal on Computing 26.5 (1997): 1411-1473.
-
-=== EXAMPLE OUTPUT ===
-
-Secret function:
-f(a) = a·<0, 1, 1, 1, 0, 0, 1, 0> + 1 (mod 2)
-Circuit:
-(0, 0): ───────H───────────────────────H───M───
-                                           │
-(1, 0): ───────H───────@───────────────H───M───
-                       │                   │
-(2, 0): ───────H───────┼───@───────────H───M───
-                       │   │               │
-(3, 0): ───────H───────┼───┼───@───────H───M───
-                       │   │   │           │
-(4, 0): ───────H───────┼───┼───┼───────H───M───
-                       │   │   │           │
-(5, 0): ───────H───────┼───┼───┼───────H───M───
-                       │   │   │           │
-(6, 0): ───────H───────┼───┼───┼───@───H───M───
-                       │   │   │   │       │
-(7, 0): ───────H───────┼───┼───┼───┼───H───M───
-                       │   │   │   │
-(8, 0): ───X───H───X───X───X───X───X───────────
-Sampled results:
-Counter({'01110010': 3})
-Most common matches secret factors:
-True
-"""
-
-import random
-
-import cirq
+import numpy as np
 
 
-def main(qubit_count=8):
-    circuit_sample_count = 3
+def main():
+    """
+    Executes the Deutsch-Jozsa algorithm.
+    """
+    input_qubits = [GridQubit(i, 0) for i in range(args.num_qubits)]
+    output_qubit = GridQubit(args.num_qubits, 0)
+    oracle = deutsch_jozsa_oracle(input_qubits, output_qubit)
+    circuit = deutsch_jozsa_algorithm(input_qubits, output_qubit, oracle)
+    simulator = Simulator()
+    simulator.run(circuit, repetitions=args.num_shots)
 
-    # Choose qubits to use.
-    input_qubits = [cirq.GridQubit(i, 0) for i in range(qubit_count)]
-    output_qubit = cirq.GridQubit(qubit_count, 0)
 
-    # Pick coefficients for the oracle and create a circuit to query it.
-    secret_bias_bit = random.randint(0, 1)
-    secret_factor_bits = [random.randint(0, 1) for _ in range(qubit_count)]
-    oracle = make_oracle(input_qubits, output_qubit, secret_factor_bits, secret_bias_bit)
-    print(
-        'Secret function:\nf(a) = '
-        f"a·<{', '.join(str(e) for e in secret_factor_bits)}> + "
-        f"{secret_bias_bit} (mod 2)"
+def deutsch_jozsa_oracle(input_qubits: list[GridQubit], output_qubit: GridQubit):
+    """
+    Implements the Deutsch-Jozsa oracle.
+
+    Args:
+        input_qubits (list[GridQubit]): List of input qubits.
+        output_qubit (GridQubit): Output qubit.
+
+    Yields:
+        Gate operations to construct the Deutsch-Jozsa oracle.
+    """
+    if np.random.randint(0, 2):
+        yield X(output_qubit)
+    if np.random.randint(0, 2):
+        return
+
+    on_states = np.random.choice(
+        range(2**args.num_qubits),
+        2**args.num_qubits // 2,
+        replace=False,
     )
 
-    # Embed the oracle into a special quantum circuit querying it exactly once.
-    circuit = make_bernstein_vazirani_circuit(input_qubits, output_qubit, oracle)
-    print('Circuit:')
-    print(circuit)
+    def add_cx(input_qubits, bit_string):
+        for qubit, bit in zip(input_qubits, reversed(bit_string)):
+            if bit == "1":
+                yield X(qubit)
 
-    # Sample from the circuit a couple times.
-    simulator = cirq.Simulator()
-    result = simulator.run(circuit, repetitions=circuit_sample_count)
-    frequencies = result.histogram(key='result', fold_func=bitstring)
-    print(f'Sampled results:\n{frequencies}')
+    mct = ControlledGate(sub_gate=X, num_controls=len(input_qubits))
 
-    # Check if we actually found the secret value.
-    most_common_bitstring = frequencies.most_common(1)[0][0]
-    print(
-        'Most common matches secret factors:\n'
-        f'{most_common_bitstring == bitstring(secret_factor_bits)}'
-    )
+    for state in on_states:
+        yield add_cx(input_qubits, f"{state:0b}")
+        yield mct(*input_qubits, output_qubit)
+        yield add_cx(input_qubits, f"{state:0b}")
 
 
-def make_oracle(input_qubits, output_qubit, secret_factor_bits, secret_bias_bit):
-    """Gates implementing the function f(a) = a·factors + bias (mod 2)."""
+def deutsch_jozsa_algorithm(
+    input_qubits: list[GridQubit], output_qubit: GridQubit, oracle
+) -> Circuit:
+    """
+    Implements the Deutsch-Jozsa algorithm.
 
-    if secret_bias_bit:
-        yield cirq.X(output_qubit)
+    Args:
+        input_qubits (list[GridQubit]): The input qubits.
+        output_qubit (GridQubit): The output qubit.
+        oracle: The oracle function.
 
-    for qubit, bit in zip(input_qubits, secret_factor_bits):
-        if bit:  # pragma: no cover
-            yield cirq.CNOT(qubit, output_qubit)
-
-
-def make_bernstein_vazirani_circuit(input_qubits, output_qubit, oracle):
-    """Solves for factors in f(a) = a·factors + bias (mod 2) with one query."""
-
-    c = cirq.Circuit()
-
-    # Initialize qubits.
-    c.append([cirq.X(output_qubit), cirq.H(output_qubit), cirq.H.on_each(*input_qubits)])
-
-    # Query oracle.
-    c.append(oracle)
-
-    # Measure in X basis.
-    c.append([cirq.H.on_each(*input_qubits), cirq.measure(*input_qubits, key='result')])
-
-    return c
+    Returns:
+        Circuit: The quantum circuit representing the Deutsch-Jozsa algorithm.
+    """
+    qc = Circuit()
+    qc.append([X(output_qubit), H(output_qubit), H.on_each(*input_qubits)])
+    qc.append(oracle)
+    qc.append([H.on_each(*input_qubits), measure(*input_qubits, key="result")])
+    return qc
 
 
 def bitstring(bits):
-    return ''.join(str(int(b)) for b in bits)
+    """
+    Converts a list of bits to a string representation.
+
+    Args:
+        bits (list): A list of bits.
+
+    Returns:
+        str: The string representation of the bits.
+    """
+    return "".join(str(int(b)) for b in bits)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
