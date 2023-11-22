@@ -5,6 +5,7 @@ from tools.interface import args
 
 import random
 
+
 def main():
     """
     Executes the Bernstein-Vazirani algorithm using the specified arguments.
@@ -13,9 +14,8 @@ def main():
     circuit = bernstein_vazirani_algorithm(oracle_gate, args.num_qubits)
     backend = get_backend(args.provider, args.backend)
     transpiled_circuit = transpile(circuit, backend)
-    backend.run(
-        transpiled_circuit, shots=args.num_shots
-    ).result()
+    backend.run(transpiled_circuit, shots=args.num_shots).result()
+
 
 def bernstein_vazirani_oracle(n: int) -> QuantumCircuit:
     """
@@ -42,6 +42,7 @@ def bernstein_vazirani_oracle(n: int) -> QuantumCircuit:
     oracle_gate.name = "Oracle"
     return oracle_gate
 
+
 def bernstein_vazirani_algorithm(oracle: QuantumCircuit, n: int) -> QuantumCircuit:
     """
     Implements the Bernstein-Vazirani algorithm.
@@ -64,6 +65,7 @@ def bernstein_vazirani_algorithm(oracle: QuantumCircuit, n: int) -> QuantumCircu
     qc.measure(range(n), range(n))
 
     return qc
+
 
 if __name__ == "__main__":
     main()
