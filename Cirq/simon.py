@@ -1,4 +1,4 @@
-from cirq import LineQubit, MatrixGate, Circuit, measure, Simulator, X, H, CNOT
+from cirq import LineQubit, MatrixGate, Circuit, measure, Simulator, H
 
 from tools.interface import args
 
