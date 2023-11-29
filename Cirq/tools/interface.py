@@ -16,12 +16,4 @@ parser.add_argument(
     help="The number of shots that the simulator will simulate.",
 )
 
-
-parser.add_argument(
-    "--backend",
-    type=str,
-    help="The backend that it should be 'qasm_simulator', 'statevector_simulator' or ... .",
-    # [ ]: Add other backends.
-)
-
 args, additional_args = parser.parse_known_args()   # This line should be the last line of this file.
