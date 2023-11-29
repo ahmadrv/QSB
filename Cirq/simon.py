@@ -28,7 +28,6 @@ def simon_oracle(qubits):
     """
     n = args.num_qubits
     secret_string = f"{random.getrandbits(n):0{n}b}"
-    print(secret_string)
     permuts = np.random.permutation(2**n)
     query_op = np.zeros((4**n, 4**n))
     for x in range(2**n):
@@ -61,7 +60,7 @@ def simon_measurements(qubits, oracle):
 
     simulator = Simulator()
     return [
-        simulator.run(qc).measurements["result"][0] for _ in range(args.num_shots)
+        simulator.run(qc).measurements["result"][0] for _ in range(2 * args.num_qubit)
     ]
 
 
