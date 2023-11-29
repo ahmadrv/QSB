@@ -9,18 +9,19 @@ Attributes:
     benchmarks (list): A list of supported benchmarks.
 """
 
-algorithms = ["deutsch_jozsa", "bernstein_vazirani"]
+algorithms = ["deutsch_jozsa", "bernstein_vazirani", "simon"]
 
-platforms = ["Qiskit"]
+platforms = ["Qiskit", "Cirq"]
 
-providers = {"Qiskit": ["aer", "ddsim"]}
+providers = {"Qiskit": ["aer", "ddsim"],
+             "Cirq": ["default"]}
 
 backends = {                           # [ ]: The correspond algorithm for commented backends should be implemented
     "aer": [
         "aer_simulator",
         "qasm_simulator",
         "aer_simulator_density_matrix",
-        # "statevector_simulator",      # [ ]: 
+        # "statevector_simulator",
         # "unitary_simulator",
         # "pulse_simulator",
     ],
@@ -33,6 +34,9 @@ backends = {                           # [ ]: The correspond algorithm for comme
         # "path_sim_statevector_simulator",
         # "unitary_simulator",
     ],
+    "default": [
+        "default"
+    ]
 }
 
 benchmarks = ["runtime", "memory_usage"]
