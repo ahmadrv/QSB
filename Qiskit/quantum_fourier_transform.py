@@ -3,7 +3,7 @@ from qiskit import QuantumCircuit, transpile
 from tools.provider import get_backend
 from tools.interface import args
 
-import random
+from random import getrandbits
 import numpy as np
 
 
@@ -53,8 +53,7 @@ def bin_to_qstate(n: int) -> QuantumCircuit:
         a quantum state.
     """
     qc = QuantumCircuit(n, n)
-    random_string = f"{random.getrandbits(n):=0{n}b}"
-    print(random_string)
+    random_string = f"{getrandbits(n):=0{n}b}"
     for idx, bit in enumerate(reversed(random_string)):
         if bit == "1":
             qc.x(idx)
