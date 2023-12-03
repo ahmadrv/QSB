@@ -1,75 +1,56 @@
-# pylint: disable=wrong-or-nonexistent-copyright-notice
-"""Creates and simulates a circuit for Quantum Fourier Transform(QFT) on 4 qubits.
+from cirq import LineQubit, CZ, Circuit, measure, Simulator, inverse, H, SWAP, X
 
-In this example we demonstrate Fourier Transform on
-(1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0) vector. To do the same, we prepare the input state of the
-qubits as |0000>.
-=== EXAMPLE OUTPUT ===
-
-Circuit:
-(0, 0): ─H───@^0.5───×───H────────────@^0.5─────×───H──────────@^0.5──×─H
-             │       │                │         │               │     │
-(0, 1): ─────@───────×───@^0.25───×───@─────────×───@^0.25───×──@─────×──
-                         │        │                 │        │
-(1, 0): ─────────────────┼────────┼───@^0.125───×───┼────────┼───────────
-                         │        │   │         │   │        │
-(1, 1): ─────────────────@────────×───@─────────×───@────────×───────────
-
-FinalState
-[0.25+0.j 0.25+0.j 0.25+0.j 0.25+0.j 0.25+0.j 0.25+0.j 0.25+0.j 0.25+0.j
- 0.25+0.j 0.25+0.j 0.25+0.j 0.25+0.j 0.25+0.j 0.25+0.j 0.25+0.j 0.25+0.j]
-"""
+from tools.interface import args
 
 import numpy as np
-
-import cirq
+from random import getrandbits
 
 
 def main():
-    """Demonstrates Quantum Fourier transform."""
-    # Create circuit
-    qft_circuit = generate_2x2_grid_qft_circuit()
-    print('Circuit:')
-    print(qft_circuit)
-    # Simulate and collect final_state
-    simulator = cirq.Simulator()
-    result = simulator.simulate(qft_circuit)
-    print()
-    print('FinalState')
-    print(np.around(result.final_state_vector, 3))
+    qubits = LineQubit.range(args.num_qubits)
+    print(qft_algorithm(qubits))
 
 
-def _cz_and_swap(q0, q1, rot):
-    yield cirq.CZ(q0, q1) ** rot
-    yield cirq.SWAP(q0, q1)
+def bin_to_qstate(qubits):
+    qc = Circuit()
+    n = len(qubits)
+    random_string = f"{getrandbits(n):=0{n}b}"
+    for idx, bit in enumerate(random_string):
+        if bit == "1":
+            qc.append(X(qubits[idx]))
+
+    return qc
 
 
-# Create a quantum fourier transform circuit for 2*2 planar qubit architecture.
-# Circuit is adopted from https://arxiv.org/pdf/quant-ph/0402196.pdf
-def generate_2x2_grid_qft_circuit():
-    # Define a 2*2 square grid of qubits.
-    a, b, c, d = [
-        cirq.GridQubit(0, 0),
-        cirq.GridQubit(0, 1),
-        cirq.GridQubit(1, 1),
-        cirq.GridQubit(1, 0),
-    ]
+def qft(qubits):
+    qc = Circuit()
 
-    circuit = cirq.Circuit(
-        cirq.H(a),
-        _cz_and_swap(a, b, 0.5),
-        _cz_and_swap(b, c, 0.25),
-        _cz_and_swap(c, d, 0.125),
-        cirq.H(a),
-        _cz_and_swap(a, b, 0.5),
-        _cz_and_swap(b, c, 0.25),
-        cirq.H(a),
-        _cz_and_swap(a, b, 0.5),
-        cirq.H(a),
-        strategy=cirq.InsertStrategy.EARLIEST,
-    )
-    return circuit
+    n = len(qubits)
+
+    for target in range(n - 1, -1, -1):
+        qc.append(H(qubits[target]))
+
+        for control in range(target - 1, -1, -1):
+            r = target - control + 1
+            gate = CZ(qubits[control], qubits[target]) ** (2 * np.pi / 2**r)
+            qc.append(gate)
+
+    for idx in range(n // 2):
+        qc.append(SWAP(qubits[idx], qubits[n - idx - 1]))
+
+    return qc
 
 
-if __name__ == '__main__':
+def qft_algorithm(qubits):
+    qc = bin_to_qstate(qubits)
+    qc_qft = qft(qubits)
+    qc.append(qc_qft)
+    qc.append(inverse(qc_qft))
+    qc.append([measure(*qubits, key="result")])
+
+    simulator = Simulator()
+    return [simulator.run(qc).measurements["result"][0] for _ in range(args.num_qubit)]
+
+
+if __name__ == "__main__":
     main()
