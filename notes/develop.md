@@ -3,8 +3,8 @@
 - Algorithms
   - [x] Deutsch-Jozsa
   - [x] Bernstain-Vazirani
-  - [ ] Simon
-  - [ ] QFT
+  - [x] Simon
+  - [x] QFT
   - [ ] Quantum Phase Estimation
   - [ ] Shor
   - [ ] Grover
