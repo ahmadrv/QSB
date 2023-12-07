@@ -1,74 +1,62 @@
-from cirq import GridQubit, Circuit, measure, Simulator, X, H, CNOT
+from cirq import measure, LineQubit, Circuit, Simulator, X, H, CNOT
 
+from tools.provider import get_backend
 from tools.interface import args
 
-import random
+from random import getrandbits
 
 
 def main():
     """
-    Executes the Bernstein-Vazirani algorithm.
-
-    This function generates the necessary qubits, initializes the secret bias
-    and factor bits, creates the oracle and circuit, and runs the simulation.
+    Executes the Bernstein-Vazirani algorithm using the specified
+    number of qubits and shots.
     """
-    input_qubits = [GridQubit(i, 0) for i in range(args.num_qubits)]
-    output_qubit = GridQubit(args.num_qubits, 0)
-    secret_bias_bit = random.randint(0, 1)
-    secret_factor_bits = [random.randint(0, 1) for _ in range(args.num_qubits)]
-    oracle = bernstein_vazirani_oracle(
-        input_qubits, output_qubit, secret_factor_bits, secret_bias_bit
-    )
-    circuit = bernstein_vazirani_algorithm(input_qubits, output_qubit, oracle)
-    simulator = Simulator()
-    simulator.run(circuit, repetitions=args.num_shots)
+    qubits = LineQubit.range(args.num_qubits + 1)
+    oracle = bernstein_vazirani_oracle(qubits)
+    circuit = bernstein_vazirani_algorithm(oracle)
+    backend = get_backend(args.provider, args.backend)
+    backend.run(
+        circuit, repetitions=args.num_shots
+    )  # [ ]: Is it essential to return the results of not?!
 
 
-def bernstein_vazirani_oracle(
-    input_qubits: list[GridQubit],
-    output_qubit: GridQubit,
-    secret_factor_bits: list[int],
-    secret_bias_bit: int,
-):
+def bernstein_vazirani_oracle(qubits: list[LineQubit]) -> Circuit:
     """
-    Implements the oracle for the Bernstein-Vazirani algorithm.
+    Constructs the oracle circuit for the Bernstein-Vazirani algorithm.
 
     Args:
-        input_qubits (list[GridQubit]): The input qubits.
-        output_qubit (GridQubit): The output qubit.
-        secret_factor_bits (list[int]): The secret factor bits.
-        secret_bias_bit (int): The secret bias bit.
+        qubits (list[LineQubit]): The list of qubits to be used in the circuit.
 
-    Yields:
-        GateOperation: The gate operations representing the oracle.
+    Returns:
+        Circuit: The constructed oracle circuit.
     """
-    if secret_bias_bit:
-        yield X(output_qubit)
+    num_qubits = len(qubits)
+    oracle = Circuit()
+    secret_string = f"{getrandbits(num_qubits - 1):=0{num_qubits - 1}b}"
 
-    for qubit, bit in zip(input_qubits, secret_factor_bits):
-        if bit:
-            yield CNOT(qubit, output_qubit)
+    for qubit, bit in zip(qubits, secret_string):
+        if bit == "1":
+            oracle.append([CNOT(qubit, qubits[-1])])
+
+    return oracle
 
 
-def bernstein_vazirani_algorithm(
-    input_qubits: list[GridQubit], output_qubit: GridQubit, oracle
-) -> Circuit:
+def bernstein_vazirani_algorithm(qubits: list[LineQubit], oracle: Circuit) -> Circuit:
     """
     Implements the Bernstein-Vazirani algorithm.
 
     Args:
-        input_qubits (list[GridQubit]): The list of input qubits.
-        output_qubit (GridQubit): The output qubit.
-        oracle: The oracle circuit.
+        qubits (list[LineQubit]): The list of qubits to be used in the algorithm.
+        oracle (Circuit): The oracle circuit that encodes the secret string.
 
     Returns:
-        Circuit: The Bernstein-Vazirani algorithm circuit.
+        Circuit: The circuit representing the Bernstein-Vazirani algorithm.
     """
-    qc = Circuit()
-    qc.append([X(output_qubit), H(output_qubit), H.on_each(*input_qubits)])
-    qc.append(oracle)
-    qc.append([H.on_each(*input_qubits), measure(*input_qubits, key="result")])
-    return qc
+    algorithm = Circuit()
+    algorithm.append([X(qubits[-1]), H.on_each(*qubits)])
+    algorithm.append(oracle)
+    algorithm.append([H.on_each(qubits[:-1]), measure(qubits[:-1], key="result")])
+    return algorithm
 
 
 if __name__ == "__main__":
