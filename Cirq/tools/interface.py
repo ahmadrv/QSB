@@ -16,4 +16,16 @@ parser.add_argument(
     help="The number of shots that the simulator will simulate.",
 )
 
+parser.add_argument(
+    "--provider",
+    type=str,
+    help="The provider that it should be 'cirq' or 'qsimcirq' .",
+)
+
+parser.add_argument(
+    "--backend",
+    type=str,
+    help="The backend that it should be 'pure', 'QSimSimulator' or ... .",
+)
+
 args, additional_args = parser.parse_known_args()   # This line should be the last line of this file.
