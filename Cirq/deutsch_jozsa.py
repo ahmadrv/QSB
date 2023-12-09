@@ -1,89 +1,79 @@
-from cirq import GridQubit, ControlledGate, Circuit, Simulator, measure, X, H
+from cirq import LineQubit, ControlledGate, Circuit, Simulator, measure, X, H
 
+from tools.provider import get_backend
 from tools.interface import args
 
-import numpy as np
+from random import sample, randint
 
 
 def main():
     """
-    Executes the Deutsch-Jozsa algorithm.
+    Executes the Deutsch-Jozsa algorithm using the specified
+    number of qubits and shots.
     """
-    input_qubits = [GridQubit(i, 0) for i in range(args.num_qubits)]
-    output_qubit = GridQubit(args.num_qubits, 0)
-    oracle = deutsch_jozsa_oracle(input_qubits, output_qubit)
-    circuit = deutsch_jozsa_algorithm(input_qubits, output_qubit, oracle)
-    simulator = Simulator()
-    simulator.run(circuit, repetitions=args.num_shots)
+    qubits = LineQubit.range(args.num_qubits + 1)
+    oracle = deutsch_jozsa_oracle(qubits)
+    circuit = deutsch_jozsa_algorithm(oracle)
+    backend = get_backend(args.provider, args.backend)
+    backend.run(
+        circuit, repetitions=args.num_shots
+    )  # [ ]: Is it essential to return the results of not?!
 
 
-def deutsch_jozsa_oracle(input_qubits: list[GridQubit], output_qubit: GridQubit):
+def deutsch_jozsa_oracle(qubits: list[LineQubit]):
     """
-    Implements the Deutsch-Jozsa oracle.
+    Constructs the oracle circuit for the Deutsch-Jozsa algorithm.
 
     Args:
-        input_qubits (list[GridQubit]): List of input qubits.
-        output_qubit (GridQubit): Output qubit.
+        qubits (list[LineQubit]): The list of qubits to be used in the circuit.
 
-    Yields:
-        Gate operations to construct the Deutsch-Jozsa oracle.
+    Returns:
+        Circuit: The constructed oracle circuit.
     """
-    if np.random.randint(0, 2):
-        yield X(output_qubit)
-    if np.random.randint(0, 2):
-        return
+    num_qubits = len(qubits) - 1
+    oracle = Circuit()
 
-    on_states = np.random.choice(
-        range(2**args.num_qubits),
-        2**args.num_qubits // 2,
-        replace=False,
-    )
+    if randint(0, 1):
+        oracle.append(X(qubits[-2]))
 
-    def add_cx(input_qubits, bit_string):
-        for qubit, bit in zip(input_qubits, reversed(bit_string)):
+    if randint(0, 1):
+        return oracle
+
+    on_states = sample(range(2 ** (num_qubits)), 2 ** (num_qubits) // 2)
+
+    def add_cx(qubits, bit_string):
+        circuit = Circuit()
+        for qubit, bit in zip(qubits[:-1], bit_string):
             if bit == "1":
-                yield X(qubit)
+                circuit.append(X(qubit))
+        return circuit
 
-    mct = ControlledGate(sub_gate=X, num_controls=len(input_qubits))
+    mct = ControlledGate(sub_gate=X, num_controls=num_qubits)
 
     for state in on_states:
-        yield add_cx(input_qubits, f"{state:0b}")
-        yield mct(*input_qubits, output_qubit)
-        yield add_cx(input_qubits, f"{state:0b}")
+        oracle.append(add_cx(qubits, f"{state:0b}"))
+        oracle.append(mct(*qubits))
+        oracle.append(add_cx(qubits, f"{state:0b}"))
+
+    return oracle
 
 
-def deutsch_jozsa_algorithm(
-    input_qubits: list[GridQubit], output_qubit: GridQubit, oracle
-) -> Circuit:
+def deutsch_jozsa_algorithm(qubits: list[LineQubit], oracle: Circuit) -> Circuit:
     """
     Implements the Deutsch-Jozsa algorithm.
 
     Args:
-        input_qubits (list[GridQubit]): The input qubits.
-        output_qubit (GridQubit): The output qubit.
-        oracle: The oracle function.
+        qubits (list[LineQubit]): The list of qubits to be used in the algorithm.
+        oracle (Circuit): The oracle circuit representing the function to be evaluated.
 
     Returns:
-        Circuit: The quantum circuit representing the Deutsch-Jozsa algorithm.
+        Circuit: The circuit implementing the Deutsch-Jozsa algorithm.
     """
-    qc = Circuit()
-    qc.append([X(output_qubit), H(output_qubit), H.on_each(*input_qubits)])
-    qc.append(oracle)
-    qc.append([H.on_each(*input_qubits), measure(*input_qubits, key="result")])
-    return qc
-
-
-def bitstring(bits):
-    """
-    Converts a list of bits to a string representation.
-
-    Args:
-        bits (list): A list of bits.
-
-    Returns:
-        str: The string representation of the bits.
-    """
-    return "".join(str(int(b)) for b in bits)
+    algorithm = Circuit()
+    algorithm.append([X(qubits[-1]), H.on_each(*qubits)])
+    algorithm.append(oracle)
+    algorithm.append([H.on_each(qubits[:-1]), measure(qubits[:-1], key="result")])
+    return algorithm
 
 
 if __name__ == "__main__":

@@ -3,12 +3,13 @@ from qiskit import QuantumCircuit, transpile
 from tools.provider import get_backend
 from tools.interface import args
 
-import numpy as np
+from random import sample, randint
 
 
 def main():
     """
-    Main function that executes the Deutsch-Jozsa algorithm.
+    Executes the Deutsch-Jozsa algorithm using the specified
+    number of qubits and shots.
     """
     oracle = deutsch_jozsa_oracle(args.num_qubits)
     circuit = deutsch_jozsa_algorithm(oracle)
@@ -19,35 +20,37 @@ def main():
 
 def deutsch_jozsa_oracle(num_qubits: int) -> QuantumCircuit:
     """
-    Create a random Deutsch-Jozsa oracle.
+    Creates a quantum circuit representing the oracle for the Deutsch-Jozsa
+    algorithm.
+
+    Args:
+        num_qubits (int): The number of qubits in the circuit.
+
+    Returns:
+        QuantumCircuit: The quantum circuit representing the oracle.
     """
-    qc = QuantumCircuit(num_qubits + 1)
-    if np.random.randint(0, 2):
-        qc.x(num_qubits)
-    if np.random.randint(0, 2):
-        return qc
+    oracle = QuantumCircuit(num_qubits + 1)
 
-    on_states = np.random.choice(
-        range(2**num_qubits),
-        2**num_qubits // 2,
-        replace=False,
-    )
+    if randint(0, 1):
+        oracle.x(num_qubits)
 
-    def add_cx(qc, bit_string):
+    if randint(0, 1):
+        return oracle
+
+    on_states = sample(range(2**num_qubits), 2**num_qubits // 2)
+
+    def add_cx(circuit, bit_string):
         for qubit, bit in enumerate(reversed(bit_string)):
             if bit == "1":
-                qc.x(qubit)
-        return qc
+                circuit.x(qubit)
+        return circuit
 
     for state in on_states:
-        qc.barrier()
-        qc = add_cx(qc, f"{state:0b}")
-        qc.mct(list(range(num_qubits)), num_qubits)
-        qc = add_cx(qc, f"{state:0b}")
+        oracle = add_cx(oracle, f"{state:0b}")
+        oracle.mct(list(range(num_qubits)), num_qubits)
+        oracle = add_cx(oracle, f"{state:0b}")
 
-    qc.barrier()
-
-    return qc
+    return oracle
 
 
 def deutsch_jozsa_algorithm(oracle: QuantumCircuit) -> QuantumCircuit:
@@ -55,22 +58,20 @@ def deutsch_jozsa_algorithm(oracle: QuantumCircuit) -> QuantumCircuit:
     Implements the Deutsch-Jozsa algorithm.
 
     Args:
-        oracle (QuantumCircuit): The oracle circuit representing
-        the function f(x).
-        n (int): The number of qubits used in the algorithm.
+        oracle (QuantumCircuit): The oracle circuit representing the function
+        to be evaluated.
 
     Returns:
-        QuantumCircuit: The final quantum circuit after applying
-        the Deutsch-Jozsa algorithm.
+        QuantumCircuit: The circuit implementing the Deutsch-Jozsa algorithm.
     """
-    n = oracle.num_qubits - 1
-    qc = QuantumCircuit(n + 1, n)
-    qc.x(n)
-    qc.h(range(n + 1))
-    qc.compose(oracle, inplace=True)
-    qc.h(range(n))
-    qc.measure(range(n), range(n))
-    return qc
+    num_qubits = oracle.num_qubits - 1
+    algorithm = QuantumCircuit(num_qubits + 1, num_qubits)
+    algorithm.x(num_qubits)
+    algorithm.h(range(num_qubits + 1))
+    algorithm.compose(oracle, inplace=True)
+    algorithm.h(range(num_qubits))
+    algorithm.measure(range(num_qubits), range(num_qubits))
+    return algorithm
 
 
 if __name__ == "__main__":
