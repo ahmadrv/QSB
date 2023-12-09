@@ -1,87 +1,97 @@
-from cirq import LineQubit, MatrixGate, Circuit, measure, Simulator, H
+from cirq import LineQubit, Circuit, measure, H, CNOT
 
+from tools.provider import get_backend
 from tools.interface import args
 
-import numpy as np
-import galois
-import random
+from random import getrandbits
+from numpy import array
+from galois import GF
 
 
 def main():
     """
-    Executes the Simon's algorithm.
+    Executes the Simon's algorithm using the specified
+    number of qubits and shots.
     """
-    qubits = LineQubit.range(2 * args.num_qubits)
+    qubits = LineQubit.range(args.num_qubits * 2)
     oracle = simon_oracle(qubits)
-    simon_algorithm(qubits, oracle)
+    simon_algorithm(qubits, oracle, args.num_shots)
 
 
-def simon_oracle(qubits):
+def simon_oracle(qubits: list[LineQubit]) -> Circuit:
     """
-    Implements the Simon's algorithm oracle.
+    Implements the Simon oracle for the Simon's algorithm.
 
     Args:
-        qubits (List[cirq.Qid]): The qubits to apply the oracle on.
+        qubits (list[LineQubit]): The list of qubits to apply the oracle on.
 
     Returns:
-        cirq.MatrixGate: The matrix gate representing the oracle operation.
+        Circuit: The circuit representing the Simon oracle.
     """
-    n = args.num_qubits
-    secret_string = f"{random.getrandbits(n):0{n}b}"
-    permuts = np.random.permutation(2**n)
-    query_op = np.zeros((4**n, 4**n))
-    for x in range(2**n):
-        for y in range(2**n):
-            z = y ^ permuts[min(x, x ^ int(secret_string, 2))]
-            query_op[x + 2**n * z, x + 2**n * y] = 1
+    half_qubits = len(qubits) // 2
+    secret_string = f"{getrandbits(half_qubits):0{half_qubits}b}"
+    oracle = Circuit()
 
-    return MatrixGate(query_op).on(*qubits[n:], *qubits[:n])
+    for q in range(half_qubits):
+        oracle.append(CNOT(qubits[q], qubits[q + half_qubits]))
+
+    if "1" not in secret_string:
+        return oracle
+
+    i = secret_string.find("1")
+
+    for q in range(half_qubits):
+        if secret_string[q] == "1":
+            oracle.append(CNOT(qubits[i], qubits[q + half_qubits]))
+
+    return oracle
 
 
-def simon_measurements(qubits, oracle):
+def simon_measurements(
+    qubits: list[LineQubit], oracle: Circuit, num_shots: int
+) -> list[str]:
     """
-    Perform Simon's algorithm measurements on the given qubits using the
-    specified oracle.
+    Perform Simon's algorithm measurements.
 
     Args:
-        qubits (List[cirq.Qid]): The qubits to perform measurements on.
-        oracle (cirq.Gate): The oracle gate to apply.
+        qubits (list[LineQubit]): The list of qubits to be used in the algorithm.
+        oracle (Circuit): The oracle circuit for Simon's algorithm.
+        num_shots (int): The number of measurement shots to perform.
 
     Returns:
-        List[int]: The measurement results.
+        list[str]: The measurement results.
 
     """
-    n = args.num_qubits
-    qc = Circuit()
-    qc.append([H.on_each(*qubits[:n])])
-    qc.append(oracle)
-    qc.append([H.on_each(*qubits[:n])])
-    qc.append([measure(*qubits[:n], key="result")])
+    half_qubits = len(qubits) // 2
+    algorithm = Circuit()
+    algorithm.append([H.on_each(qubits[:half_qubits])])
+    algorithm.append(oracle)
+    algorithm.append([H.on_each(qubits[:half_qubits])])
+    algorithm.append([measure(qubits[:half_qubits], key="result")])
 
-    simulator = Simulator()
-    return [
-        simulator.run(qc).measurements["result"][0] for _ in range(2 * args.num_qubit)
-    ]
+    backend = get_backend(args.provider, args.backend)
+    return [backend.run(algorithm).measurements["result"][0] for _ in range(num_shots)]
 
 
-def simon_algorithm(qubits, oracle):
+def simon_algorithm(qubits: list[LineQubit], oracle: Circuit, num_shots: int) -> str:
     """
-    Implements the Simon's algorithm.
+    Runs the Simon's algorithm on the given qubits using the specified oracle circuit.
 
     Args:
-        qubits (list): List of qubits to be used in the algorithm.
-        oracle (callable): Oracle function that encodes the secret string.
+        qubits (list[LineQubit]): The qubits to run the algorithm on.
+        oracle (Circuit): The oracle circuit to be used in the algorithm.
+        num_shots (int): The number of times to run the algorithm.
 
     Returns:
-        str: The secret string obtained from the algorithm.
+        str: The result of the algorithm as a binary string.
     """
-    measurements = simon_measurements(qubits, oracle)
-    matrix = np.array(measurements).astype(int)
-    null_space = galois.GF(2)(matrix).null_space()
+    measurements = simon_measurements(qubits, oracle, num_shots)
+    matrix = array(measurements).astype(int)
+    null_space = GF(2)(matrix).null_space()
 
     if len(null_space) == 0:
         return "0" * len(measurements[0])
-    return "".join(np.array(null_space[0]).astype(str))
+    return "".join(array(null_space[0]).astype(str))
 
 
 if __name__ == "__main__":

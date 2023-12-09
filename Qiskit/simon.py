@@ -3,87 +3,93 @@ from qiskit import QuantumCircuit, transpile
 from tools.provider import get_backend
 from tools.interface import args
 
-import numpy as np
-import galois
-import random
+from random import getrandbits
+from numpy import array
+from galois import GF
 
 
 def main():
     """
-    This is the main function that executes the Simon's algorithm.
-    It creates an oracle gate using the simon_oracle function and then runs
-    the Simon's algorithm using the oracle gate.
+    Executes the Simon's algorithm using the specified
+    number of qubits and shots.
     """
     oracle_gate = simon_oracle(args.num_qubits)
-    simon_algorithm(oracle_gate)
+    simon_algorithm(oracle_gate, args.num_shots)
 
-def simon_oracle(n: int) -> QuantumCircuit:
+
+def simon_oracle(num_qubits: int) -> QuantumCircuit:
     """
-    Creates a Simon oracle circuit.
+    Creates a quantum circuit representing the oracle for the Simon's algorithm.
 
     Args:
-        n (int): The number of qubits.
+        num_qubits (int): The number of qubits in the circuit.
 
     Returns:
-        QuantumCircuit: The Simon oracle circuit.
+        QuantumCircuit: The quantum circuit representing the oracle.
     """
-    secret_string = f"{random.getrandbits(n):=0{n}b}"
-    qc = QuantumCircuit(2*n)
-    permuts = np.random.permutation(2**n)
-    query_gate = np.zeros((4**n, 4**n))
-    for x in range(2**n):
-        for y in range(2**n):
-            z = y ^ permuts[min(x, x ^ int(secret_string, 2))]
-            query_gate[x + 2**n * z, x + 2**n * y] = 1
+    secret_string = f"{getrandbits(num_qubits):=0{num_qubits}b}"
+    secret_string = secret_string[::-1]
+    oracle = QuantumCircuit(num_qubits * 2)
 
-    qc.unitary(query_gate, range(2*n))
-    qc.name = "Oracle"
-    return qc
+    for q in range(num_qubits):
+        oracle.cx(q, q + num_qubits)
+    
+    if "1" not in secret_string:
+        return oracle
+
+    i = secret_string.find("1")
+
+    for q in range(num_qubits):
+        if secret_string[q] == "1":
+            oracle.cx(i, q + num_qubits)
+
+    return oracle
 
 
-def simon_measurements(oracle: QuantumCircuit) -> QuantumCircuit:
+def simon_measurements(oracle: QuantumCircuit, num_shots: int) -> list[str]:
     """
-    Perform Simon's algorithm measurements on the given problem circuit.
+    Perform Simon's algorithm measurements on the given oracle circuit.
 
     Args:
-        oracle (QuantumCircuit): The problem circuit to be used in Simon's algorithm.
+        oracle (QuantumCircuit): The oracle circuit to be used in Simon's
+        algorithm.
 
     Returns:
-        QuantumCircuit: The circuit with Simon's algorithm measurements applied.
+        list[str]: The list of measurement outcomes obtained from running 
+        Simon's algorithm.
     """
-    n = oracle.num_qubits // 2
-    qc = QuantumCircuit(2 * n, n)
-    qc.h(range(n))
-    qc.compose(oracle, inplace=True)
-    qc.h(range(n))
-    qc.measure(range(n), range(n))
+    half_qubits = oracle.num_qubits // 2
+    algorithm = QuantumCircuit(2 * half_qubits, half_qubits)
+    algorithm.h(range(half_qubits))
+    algorithm.compose(oracle, inplace=True)
+    algorithm.h(range(half_qubits))
+    algorithm.measure(range(half_qubits), range(half_qubits))
 
     backend = get_backend(args.provider, args.backend)
-    transpiled_circuit = transpile(qc, backend)
-    result = backend.run(
-        transpiled_circuit, shots=args.num_shots, memory=True
-    ).result()
+    transpiled_circuit = transpile(algorithm, backend)
+    result = backend.run(transpiled_circuit, shots=num_shots, memory=True).result()
 
     return result.get_memory()
 
 
-def simon_algorithm(oracle: QuantumCircuit):
+def simon_algorithm(oracle: QuantumCircuit, num_shots: int) -> str:
     """
-    Implements the Simon's algorithm to solve the given problem.
+    Implements the Simon's algorithm.
 
     Args:
-        oracle (QuantumCircuit): The quantum circuit representing the problem.
+        oracle (QuantumCircuit): The oracle circuit for the Simon's problem.
 
     Returns:
-        str: The solution to the problem.
+        str: The binary string representing the solution to the Simon's problem.
     """
-    measurements = simon_measurements(oracle)
-    matrix = np.array([list(bitstring) for bitstring in measurements]).astype(int)
-    null_space = galois.GF(2)(matrix).null_space()
+    measurements = simon_measurements(oracle, num_shots)
+    matrix = array([list(bitstring) for bitstring in measurements]).astype(int)
+    null_space = GF(2)(matrix).null_space()
 
     if len(null_space) == 0:
         return "0" * len(measurements[0])
-    return "".join(np.array(null_space[0]).astype(str))
+    return "".join(array(null_space[0]).astype(str))
+
 
 if __name__ == "__main__":
     main()
