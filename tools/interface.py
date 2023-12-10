@@ -1,18 +1,25 @@
-from supported import SupportedResources
+from tools.supported import SupportedResources
 
 
 class Interface:
     def __init__(self):
         self.supported = SupportedResources()
 
-    def display_menu(self, items):
+    def _display_menu(self, items):
         for idx, item in enumerate(items, start=1):
             print(f"{idx}. {item}")
 
-    def get_user_choice(self, items):
-        self.display_menu(items)
+    def _get_user_choice(self, items):
+        self._display_menu(items)
         choice_idx = int(input("Enter the number: ")) - 1
         return items[choice_idx]
+    
+    def _get_num_qubits(self):
+        return int(input(f"Enter the number of Qubits: "))
+    
+    def _get_num_shots(self):
+        return int(input(f"Enter the number of Shots: "))
+        
 
     def get_user_inputs(self):
         print(
@@ -25,12 +32,21 @@ class Interface:
         )
 
         platforms = list(self.supported._supported.keys())
-        platform = self.get_user_choice(platforms)
+        platform = self._get_user_choice(platforms)
 
         providers = list(self.supported._supported[platform])
-        provider = self.get_user_choice(providers)
+        provider = self._get_user_choice(providers)
 
         backends = list(self.supported._supported[platform][provider])
-        backend = self.get_user_choice(backends)
+        backend = self._get_user_choice(backends)
 
-        return platform, provider, backend
+        algorithms = list(self.supported.algorithms)
+        algorithm = self._get_user_choice(algorithms)
+        
+        benchmarks = list(self.supported.benchmarks)
+        benchmark = self._get_user_choice(benchmarks)
+        
+        num_qubits = self._get_num_qubits()
+        num_shots = self._get_num_shots()
+
+        return platform, provider, backend, algorithm, benchmark, num_qubits, num_shots
