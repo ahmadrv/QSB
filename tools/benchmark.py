@@ -9,11 +9,16 @@ def runtime(*args) -> float:
         *args: The command to be executed by the subprocess.
 
     Returns:
-        The runtime of the subprocess in seconds.
+        The runtime of the subprocess in seconds, or None if the subprocess failed.
     """
     start = time.time()
-    process = subprocess.Popen(args)
-    process.wait()
+    try:
+        process = subprocess.Popen(args)
+        process.wait()
+    except Exception as e:
+        print(f"Runtime measurement failed: {e}")
+        return None
+
     return time.time() - start
 
 
