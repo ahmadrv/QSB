@@ -1,50 +1,112 @@
-"""
-This module contains information about the supported algorithms, platforms, providers, backends, and benchmarks.
+class SupportedResources:
+    """
+    A class that represents the supported resources for quantum algorithms and platforms.
 
-Attributes:
-    algorithms (list): A list of supported algorithms.
-    platforms (list): A list of supported platforms.
-    providers (dict): A dictionary of supported providers and their corresponding backends.
-    backends (dict): A dictionary of supported backends and their corresponding simulators.
-    benchmarks (list): A list of supported benchmarks.
-"""
+    Attributes:
+        _algorithms (set): A set of supported quantum algorithms.
+        _supported (dict): A dictionary that maps platforms to their supported providers and backends.
+        _benchmarks (set): A set of supported benchmarks.
 
-algorithms = ["deutsch_jozsa",
-              "bernstein_vazirani",
-              "simon",
-              "quantum_fourier_transform"]
+    Methods:
+        algorithms: Returns the supported quantum algorithms.
+        benchmarks: Returns the supported benchmarks.
+        providers(platform: str) -> list[str]: Returns the supported providers for a given platform.
+        backends(platform: str, provider: str) -> list[str]: Returns the supported backends for a given platform and provider.
+    """
 
-platforms = ["Qiskit", "Cirq"]
+    def __init__(self):
+        self._algorithms = {
+            1: "deutsch_jozsa",
+            2: "bernstein_vazirani",
+            3: "quantum_fourier_transform",
+            4: "simon",
+        }
 
-providers = {"Qiskit": ["aer", "ddsim"],
-             "Cirq": ["cirq", "qsimcirq"]}
+        self._supported = {
+            "Qiskit": {
+                "aer": {
+                    "aer_simulator",
+                    "qasm_simulator",
+                    # "statevector_simulator",
+                    # "unitary_simulator",
+                    # "pulse_simulator",
+                },
+                "ddsim": {
+                    "qasm_simulator",
+                    "hybrid_qasm_simulator",
+                    # "statevector_simulator",
+                    # "hybrid_statevector_simulator",
+                    # "path_sim_qasm_simulator",
+                    # "path_sim_statevector_simulator",
+                    # "unitary_simulator",
+                },
+            },
+            "Cirq": {
+                "cirq": {"pure", "mixed"},
+                "qsimcirq": {"QSimSimulator", "QSimhSimulator"},
+            },
+        }
 
-backends = {                        
-    "aer": [
-        "aer_simulator",
-        "qasm_simulator",
-        "aer_simulator_density_matrix",
-        # "statevector_simulator",
-        # "unitary_simulator",
-        # "pulse_simulator",
-    ],
-    "ddsim": [
-        "qasm_simulator",
-        "hybrid_qasm_simulator",
-        # "statevector_simulator",
-        #"hybrid_statevector_simulator",
-        # "path_sim_qasm_simulator",
-        # "path_sim_statevector_simulator",
-        # "unitary_simulator",
-    ],
-    "cirq": [
-        "pure",
-        "mixed"
-    ],
-    "qsimcirq": [
-        "QSimSimulator",
-        "QSimhSimulator"
-    ]
-}
+        self._benchmarks = {"runtime", "memory_usage"}
 
-benchmarks = ["runtime", "memory_usage"]
+    @property
+    def algorithms(self):
+        """
+        Returns the supported quantum algorithms.
+
+        Returns:
+            set: A set of supported quantum algorithms.
+        """
+        return self._algorithms
+
+    @property
+    def benchmarks(self):
+        """
+        Returns the supported benchmarks.
+
+        Returns:
+            set: A set of supported benchmarks.
+        """
+        return self._benchmarks
+
+    def providers(self, platform: str) -> list[str]:
+        """
+        Returns the supported providers for a given platform.
+
+        Args:
+            platform (str): The platform for which to retrieve the supported providers.
+
+        Returns:
+            list[str]: A list of supported providers for the given platform.
+
+        Raises:
+            ValueError: If an invalid platform is provided.
+        """
+        _platforms = self._supported.keys()
+        if platform not in _platforms:
+            raise ValueError(
+                "Invalid platform: expected one of {}".format(list(_platforms))
+            )
+        return list(self._supported[platform].keys())
+
+    def backends(self, platform: str, provider: str) -> list[str]:
+        """
+        Returns the supported backends for a given platform and provider.
+
+        Args:
+            platform (str): The platform for which to retrieve the supported backends.
+            provider (str): The provider for which to retrieve the supported backends.
+
+        Returns:
+            list[str]: A list of supported backends for the given platform and provider.
+
+        Raises:
+            ValueError: If an invalid platform or provider is provided.
+        """
+        _providers = self.providers(platform)
+        if provider not in _providers:
+            raise ValueError(
+                "Invalid provider: expected one of {}".format(list(_providers))
+            )
+
+        return list(self._supported[platform][provider])
