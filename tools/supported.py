@@ -16,10 +16,10 @@ class SupportedResources:
 
     def __init__(self):
         self._algorithms = {
-            1: "deutsch_jozsa",
-            2: "bernstein_vazirani",
-            3: "quantum_fourier_transform",
-            4: "simon",
+            "deutsch_jozsa",
+            "bernstein_vazirani",
+            "quantum_fourier_transform",
+            "simon",
         }
 
         self._supported = {
