@@ -22,6 +22,8 @@ class SupportedResources:
             "simon",
         }
 
+        self._platforms = {"Qiskit", "Cirq"}
+
         self._supported = {
             "Qiskit": {
                 "aer": {
@@ -42,7 +44,10 @@ class SupportedResources:
                 },
             },
             "Cirq": {
-                "cirq": {"pure", "mixed"},
+                "cirq": {
+                    "pure",
+                    # "mixed"
+                },
                 "qsimcirq": {"QSimSimulator", "QSimhSimulator"},
             },
         }
@@ -58,6 +63,16 @@ class SupportedResources:
             set: A set of supported quantum algorithms.
         """
         return self._algorithms
+
+    @property
+    def platforms(self):
+        """
+        Get the supported platforms for the tool.
+
+        Returns:
+            set: A set of supported platforms.
+        """
+        return self._platforms
 
     @property
     def benchmarks(self):
