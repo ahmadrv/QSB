@@ -98,12 +98,16 @@ def run(
             cmd.benchmark_type,
         )
 
-        if cmd.benchmark_type == "runtime":
-            benchmark += (runtime(*cmd.output), datetime.now())
+        try:
+            if cmd.benchmark_type == "runtime":
+                benchmark += (runtime(*cmd.output), datetime.now())
 
-        elif cmd.benchmark_type == "memory_usage":
-            benchmark += (memory_usage(*cmd.output), datetime.now())
+            elif cmd.benchmark_type == "memory_usage":
+                benchmark += (memory_usage(*cmd.output), datetime.now())
 
-        benchmark_id = database.create_benchmark(conn, benchmark)
+            benchmark_id = database.create_benchmark(conn, benchmark)
+        except Exception as e:
+            print(f"ERROR: {e}")
+            break
         
         print(benchmark_id)

@@ -60,7 +60,7 @@ class Command:
         self.path = str(Path(self.platform) / self.algorithm) + ".py"
 
         self.output = [
-            "python",
+            "./qsb/bin/python",
             f"{self.path}",
             "--num_qubits",
             f"{self.num_qubits}",

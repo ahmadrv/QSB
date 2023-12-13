@@ -3,7 +3,7 @@ from tools import benchmark
 
 def main():
     expr_rept = 1
-    num_qubits = list(range(2, 50))
+    num_qubits = list(range(2, 20))
     num_shots = [1]
     algorithms = [
                 "deutsch_jozsa",
@@ -13,11 +13,12 @@ def main():
     ]
     platforms = ["Qiskit"]
     providers = ["aer"]
-    backends = ["aer_simulator"]
+    backends = ["qasm_simulator"]
     
     benchmarks = ["runtime", "memory_usage"]
 
     for _ in range(expr_rept):
+        
         benchmark.run(
             num_qubits,
             num_shots,
