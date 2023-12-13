@@ -47,7 +47,7 @@ def deutsch_jozsa_oracle(num_qubits: int) -> QuantumCircuit:
 
     for state in on_states:
         oracle = add_cx(oracle, f"{state:0b}")
-        oracle.mct(list(range(num_qubits)), num_qubits)
+        oracle.mcx(list(range(num_qubits)), num_qubits)
         oracle = add_cx(oracle, f"{state:0b}")
 
     return oracle
