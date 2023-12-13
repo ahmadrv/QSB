@@ -1,4 +1,6 @@
-import subprocess, time, psutil, command, result
+import subprocess, time, psutil
+from datetime import datetime
+from tools import command, database
 
 
 def runtime(*args) -> float:
@@ -82,17 +84,26 @@ def run(
     )
 
     for cmd in commands:
-        file_path = (
-            f"results/{cmd.platform}/{cmd.provider}/{cmd.backend}/"
-            f"{cmd.algorithm}/{cmd.benchmark_type}/{cmd.num_shots}shots.csv"
+        
+        conn = database.create_connection()
+        database.initialization(conn)
+        
+        benchmark = (
+            cmd.platform,
+            cmd.provider,
+            cmd.backend,
+            cmd.algorithm,
+            cmd.num_qubits,
+            cmd.num_shots,
+            cmd.benchmark_type,
         )
 
-        result.make_csv_with_header(file_path, f"qubit,{cmd.benchmark_type}")
-
         if cmd.benchmark_type == "runtime":
-            output = f"{cmd.num_qubits},{runtime(*cmd.output)}"
+            benchmark += (runtime(*cmd.output), datetime.now())
 
         elif cmd.benchmark_type == "memory_usage":
-            output = f"{cmd.num_qubits},{memory_usage(*cmd.output)}"
+            benchmark += (memory_usage(*cmd.output), datetime.now())
 
-        result.add_result_to_file(output, file_path)
+        benchmark_id = database.create_benchmark(conn, benchmark)
+        
+        print(benchmark_id)
