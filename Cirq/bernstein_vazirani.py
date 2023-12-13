@@ -13,7 +13,7 @@ def main():
     """
     qubits = LineQubit.range(args.num_qubits + 1)
     oracle = bernstein_vazirani_oracle(qubits)
-    circuit = bernstein_vazirani_algorithm(oracle)
+    circuit = bernstein_vazirani_algorithm(qubits, oracle)
     backend = get_backend(args.provider, args.backend)
     backend.run(
         circuit, repetitions=args.num_shots

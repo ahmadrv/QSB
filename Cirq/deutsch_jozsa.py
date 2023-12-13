@@ -13,7 +13,7 @@ def main():
     """
     qubits = LineQubit.range(args.num_qubits + 1)
     oracle = deutsch_jozsa_oracle(qubits)
-    circuit = deutsch_jozsa_algorithm(oracle)
+    circuit = deutsch_jozsa_algorithm(qubits, oracle)
     backend = get_backend(args.provider, args.backend)
     backend.run(
         circuit, repetitions=args.num_shots
