@@ -1,5 +1,5 @@
 from pathlib import Path
-from supported import SupportedResources
+from tools.supported import SupportedResources
 import itertools
 
 
