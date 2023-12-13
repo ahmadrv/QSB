@@ -1,5 +1,5 @@
 from pathlib import Path
-import supported
+from supported import SupportedResources
 import itertools
 
 
@@ -41,15 +41,21 @@ class Command:
         backend: str,
         benchmark_type: str,
     ) -> None:
+        self.supported = SupportedResources()
+        
         self.num_qubits = num_qubits
         self.num_shots = num_shots
-        self.algorithm = self._check_support(algorithm, supported.algorithms)
-        self.platform = self._check_support(platform, supported.platforms)
-        self.benchmark_type = self._check_support(benchmark_type, supported.benchmarks)
-        self.provider = self._check_support(
-            provider, supported.providers[self.platform]
+        self.algorithm = self._check_support(algorithm, self.supported.algorithms)
+        self.platform = self._check_support(platform, self.supported.platforms)
+        self.benchmark_type = self._check_support(
+            benchmark_type, self.supported.benchmarks
         )
-        self.backend = self._check_support(backend, supported.backends[self.provider], self.provider)
+        self.provider = self._check_support(
+            provider, self.supported.providers(self.platform)
+        )
+        self.backend = self._check_support(
+            backend, self.supported.backends(self.platform, self.provider)
+        )
 
         self.path = str(Path(self.platform) / self.algorithm) + ".py"
 
@@ -66,7 +72,7 @@ class Command:
             f"{self.backend}",
         ]
 
-    def _check_support(self, item: str, supported: list[str], detail: str = None) -> str:
+    def _check_support(self, item: str, supported: list[str]) -> str:
         """
         A private method to check if the given item is supported or not.
 
@@ -88,17 +94,11 @@ class Command:
             If the item is not supported.
         """
         if item not in supported:
-            if detail is not None:
-                raise NotImplementedError(
-                f"{item} is not implemented yet or wrong case is selected for {detail}! "
-                + f"Please choose from {supported}"
-            )
-                
             raise NotImplementedError(
                 f"{item} is not implemented yet or wrong case is selected! "
                 + f"Please choose from {supported}"
             )
-    
+
         else:
             return item
 
