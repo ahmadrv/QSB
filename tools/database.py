@@ -1,26 +1,13 @@
 import sqlite3 as sl
 from sqlite3 import Error
+import pandas as pd
 
 default_database_addrs = "./results/benchmarks.db"
 
 
 def display_table(conn):
-    try:
-        c = conn.cursor()
-
-        # Execute a SELECT query to retrieve all rows from the 'benchmarks' table
-        c.execute("SELECT * FROM benchmarks")
-
-        # Fetch all rows from the executed query
-        rows = c.fetchall()
-
-        # Print column headers
-        header = [description[0] for description in c.description]
-        print("|".join(header))
-
-        # Print each row in the table
-        for row in rows:
-            print("|".join(str(col) for col in row))
+    try:        
+        print(pd.read_sql_query("SELECT * FROM benchmarks", conn))
 
     except Error as e:
         print(e)
