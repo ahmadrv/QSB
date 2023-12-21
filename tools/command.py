@@ -42,7 +42,7 @@ class Command:
         benchmark_type: str,
     ) -> None:
         self.supported = SupportedResources()
-        
+
         self.num_qubits = num_qubits
         self.num_shots = num_shots
         self.algorithm = self._check_support(algorithm, self.supported.algorithms)

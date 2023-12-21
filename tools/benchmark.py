@@ -3,7 +3,35 @@ from datetime import datetime
 from tools import command, database
 
 
-def runtime(*args) -> float:
+def run_command(command) -> str:
+    """
+    Executes a command using the subprocess module and returns the output.
+
+    Parameters:
+    - command: str
+        The command to be executed.
+
+    Returns:
+    - str:
+        The output of the command.
+
+    Raises:
+    - subprocess.CalledProcessError:
+        If the command execution fails, this exception will be raised.
+    """
+    
+    command = " ".join(command)
+
+    try:
+        output = subprocess.check_output(
+            command, shell=True, stderr=subprocess.STDOUT, universal_newlines=True
+        )  # [ ]: Check the arguments
+        return output
+    except subprocess.CalledProcessError as e:
+        raise e
+
+
+def runtime(args) -> float:
     """
     Measures the runtime of a subprocess.
 
@@ -14,38 +42,37 @@ def runtime(*args) -> float:
         The runtime of the subprocess in seconds, or None if the subprocess failed.
     """
     start = time.time()
-    try:
-        process = subprocess.Popen(args)
-        process.wait()
+    try:        
+        return time.time() - start, run_command(args)
     except Exception as e:
-        print(f"Runtime measurement failed: {e}")
-        return None
+        print(f"Bench time measurement failed: {e}")
+        raise e
 
-    return time.time() - start
+    
 
 
-def memory_usage(*args) -> float:
-    """
-    Returns the maximum memory usage of a process in MB.
+# def memory_usage(*args) -> float:         # [ ]: Compatilble this with run_command()
+#     """
+#     Returns the maximum memory usage of a process in MB.
 
-    Args:
-        *args: A list of arguments to be passed to the subprocess.
+#     Args:
+#         *args: A list of arguments to be passed to the subprocess.
 
-    Returns:
-        The maximum memory usage of the process in MB.
-    """
-    with subprocess.Popen(list(args)) as process:
-        pid = process.pid
-        max_memory_usage = 0
+#     Returns:
+#         The maximum memory usage of the process in MB.
+#     """
+#     with subprocess.Popen(list(args)) as process:
+#         pid = process.pid
+#         max_memory_usage = 0
 
-        while process.poll() is None:
-            memory_info = psutil.Process(pid).memory_info()
-            memory_usage = memory_info.rss
+#         while process.poll() is None:
+#             memory_info = psutil.Process(pid).memory_info()
+#             memory_usage = memory_info.rss
 
-            if memory_usage > max_memory_usage:
-                max_memory_usage = memory_usage
+#             if memory_usage > max_memory_usage:
+#                 max_memory_usage = memory_usage
 
-        return max_memory_usage / 1048576
+#         return max_memory_usage / 1048576
 
 
 def run(
@@ -84,10 +111,9 @@ def run(
     )
 
     for cmd in commands:
-        
         conn = database.create_connection()
         database.initialization(conn)
-        
+
         benchmark = (
             cmd.platform,
             cmd.provider,
@@ -100,14 +126,23 @@ def run(
 
         try:
             if cmd.benchmark_type == "runtime":
-                benchmark += (runtime(*cmd.output), datetime.now())
+                bench_time, output = runtime(cmd.output)
+                benchmark += (bench_time, output, datetime.now())
 
-            elif cmd.benchmark_type == "memory_usage":
-                benchmark += (memory_usage(*cmd.output), datetime.now())
+            # elif cmd.benchmark_type == "memory_usage":                # [ ]: Check the memory_usage()
+            #     benchmark += (memory_usage(*cmd.output), datetime.now())
 
             benchmark_id = database.create_benchmark(conn, benchmark)
         except Exception as e:
             print(f"ERROR: {e}")
-            break
-        
+            raise e
+
         print(benchmark_id)
+
+
+if __name__ == "__main__":
+    try:
+        result = run_command("sdfgsdgf")
+        print(result)
+    except subprocess.CalledProcessError as e:
+        print(f"Error executing command: {e}")

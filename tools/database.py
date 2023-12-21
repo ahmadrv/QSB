@@ -6,9 +6,8 @@ default_database_addrs = "./results/benchmarks.db"
 
 
 def display_table(conn):
-    try:        
-        print(pd.read_sql_query("SELECT * FROM benchmarks", conn))
-
+    try:
+        print(pd.read_sql_query("SELECT * FROM benchmarks", conn).to_markdown())
     except Error as e:
         print(e)
 
@@ -44,6 +43,7 @@ def initialization(conn):
                                         num_shot integer NOT NULL,
                                         type text NOT NULL,
                                         value real NOT NULL,
+                                        output text,
                                         date text NOT NULL
                                     );
     """
@@ -64,16 +64,18 @@ def create_benchmark(conn, benchmark):
         num_shot,
         type,
         value,
+        output,
         date
-    ) VALUES(?,?,?,?,?,?,?,?,?)
+    ) VALUES(?,?,?,?,?,?,?,?,?,?)
     """
     cur = conn.cursor()
     cur.execute(sql, benchmark)
     conn.commit()
     return cur.lastrowid
 
+
 if __name__ == "__main__":
     conn = create_connection()
-    
+
     with conn:
         display_table(conn)

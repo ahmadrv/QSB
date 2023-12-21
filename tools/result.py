@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
-import plotly.graph_objects as go
+# import plotly.graph_objects as go
 import pandas as pd
 import database
 import os
@@ -68,8 +68,8 @@ def plot_result(
 if __name__ == "__main__":
     ax, fig = make_figure()
     
-    plot_result("Qiskit", "aer", "qasm_simulator", "deutsch_jozsa", "memory_usage")
-    plot_result("Qiskit", "aer", "aer_simulator", "deutsch_jozsa", "memory_usage")
-    plot_result("Qiskit", "aer", "aer_simulator", "simon", "memory_usage")
+    plot_result("Qiskit", "aer", "qasm_simulator", "deutsch_jozsa", "runtime")
+    plot_result("Qiskit", "aer", "aer_simulator", "deutsch_jozsa", "runtime")
+    
     fig.suptitle('Deutsch-Jozsa Memory Usage', fontsize=30)
     plt.show()
