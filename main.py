@@ -2,7 +2,7 @@ from tools import benchmark
 
 def main():
     expr_rept = 1
-    num_qubits = list(range(29, 35))
+    num_qubits = list(range(29, 30))
     num_shots = [1]
     algorithms = [
                 "deutsch_jozsa",
@@ -14,7 +14,7 @@ def main():
     providers = ["aer"]
     backends = ["aer_simulator", "qasm_simulator"]
     
-    benchmarks = ["runtime"]
+    benchmarks = ["runtime", "memory_usage"]
 
     for _ in range(expr_rept):
         

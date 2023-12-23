@@ -1,76 +1,37 @@
-import subprocess, time, psutil
+import subprocess, time, tracemalloc
 from datetime import datetime
 from tools import command, database
 
 
 def run_command(command: list[str]) -> str:
-    """
-    Executes a command using the subprocess module and returns the output.
-
-    Parameters:
-    - command: str
-        The command to be executed.
-
-    Returns:
-    - str:
-        The output of the command.
-
-    Raises:
-    - subprocess.CalledProcessError:
-        If the command execution fails, this exception will be raised.
-    """
-
-    result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    result = subprocess.run(command, capture_output=True)
+    print(result)
     if result.returncode != 0:
         return result.stderr.decode()
     else:
         return result.stdout.decode()
-   
 
+def get_memory_usage():
+    snapshot = tracemalloc.take_snapshot()
+    top_stats = snapshot.statistics('lineno')
 
-def runtime(args) -> float:
-    """
-    Measures the runtime of a subprocess.
+    total_size = sum(stat.size for stat in top_stats)
+    return total_size
 
-    Args:
-        *args: The command to be executed by the subprocess.
-
-    Returns:
-        The runtime of the subprocess in seconds, or None if the subprocess failed.
-    """
+def runtime(args):
     start = time.time()
     output = run_command(args)
     end = time.time()
 
     return end - start, output
 
-
+def memory_usage(args):         
+    tracemalloc.start()
+    output = run_command(args)
+    memory_used = get_memory_usage() / (1024 * 1024)
+    tracemalloc.stop()
     
-
-
-# def memory_usage(*args) -> float:         # [ ]: Compatilble this with run_command()
-#     """
-#     Returns the maximum memory usage of a process in MB.
-
-#     Args:
-#         *args: A list of arguments to be passed to the subprocess.
-
-#     Returns:
-#         The maximum memory usage of the process in MB.
-#     """
-#     with subprocess.Popen(list(args)) as process:
-#         pid = process.pid
-#         max_memory_usage = 0
-
-#         while process.poll() is None:
-#             memory_info = psutil.Process(pid).memory_info()
-#             memory_usage = memory_info.rss
-
-#             if memory_usage > max_memory_usage:
-#                 max_memory_usage = memory_usage
-
-#         return max_memory_usage / 1048576
-
+    return memory_used, output
 
 def run(
     num_qubits: list[int],
@@ -121,23 +82,17 @@ def run(
             cmd.benchmark_type,
         )
 
-        try:
-            if cmd.benchmark_type == "runtime":
-                bench_time, output = runtime(cmd.output)
-                benchmark += (bench_time, output, datetime.now())
+        if cmd.benchmark_type == "runtime":
+            bench_time, output = runtime(cmd.output)
+            benchmark += (bench_time, output, datetime.now())
 
-            # elif cmd.benchmark_type == "memory_usage":                # [ ]: Check the memory_usage()
-            #     benchmark += (memory_usage(*cmd.output), datetime.now())
+        elif cmd.benchmark_type == "memory_usage":   
+            memory_used, output = memory_usage(cmd.output)
+            benchmark += (memory_used, output, datetime.now())
 
-            benchmark_id = database.create_benchmark(conn, benchmark)
-        except Exception as e:
-            print(f"ERROR: {e}")
-            raise e
-
+        benchmark_id = database.create_benchmark(conn, benchmark)
         print(benchmark_id)
 
 
 if __name__ == "__main__":
-    
-    result = run_command("sdfgsdgf")
-    print(result)
+    pass

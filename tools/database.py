@@ -7,7 +7,7 @@ default_database_addrs = "./results/benchmarks.db"
 
 def display_table(conn):
     try:
-        print(pd.read_sql_query("SELECT * FROM benchmarks", conn).to_markdown())
+        print(pd.read_sql_query("SELECT * FROM benchmarks", conn).to_csv('test.csv'))
     except Error as e:
         print(e)
 
