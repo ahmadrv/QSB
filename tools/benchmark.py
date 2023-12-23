@@ -3,7 +3,7 @@ from datetime import datetime
 from tools import command, database
 
 
-def run_command(command) -> str:
+def run_command(command: list[str]) -> str:
     """
     Executes a command using the subprocess module and returns the output.
 
@@ -19,16 +19,13 @@ def run_command(command) -> str:
     - subprocess.CalledProcessError:
         If the command execution fails, this exception will be raised.
     """
-    
-    command = " ".join(command)
 
-    try:
-        output = subprocess.check_output(
-            command, shell=True, stderr=subprocess.STDOUT, universal_newlines=True
-        )  # [ ]: Check the arguments
-        return output
-    except subprocess.CalledProcessError as e:
-        raise e
+    result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if result.returncode != 0:
+        return result.stderr.decode()
+    else:
+        return result.stdout.decode()
+   
 
 
 def runtime(args) -> float:
@@ -42,11 +39,11 @@ def runtime(args) -> float:
         The runtime of the subprocess in seconds, or None if the subprocess failed.
     """
     start = time.time()
-    try:        
-        return time.time() - start, run_command(args)
-    except Exception as e:
-        print(f"Bench time measurement failed: {e}")
-        raise e
+    output = run_command(args)
+    end = time.time()
+
+    return end - start, output
+
 
     
 
@@ -141,8 +138,6 @@ def run(
 
 
 if __name__ == "__main__":
-    try:
-        result = run_command("sdfgsdgf")
-        print(result)
-    except subprocess.CalledProcessError as e:
-        print(f"Error executing command: {e}")
+    
+    result = run_command("sdfgsdgf")
+    print(result)
