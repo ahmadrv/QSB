@@ -22,6 +22,8 @@ def runtime(args):
     start = time.time()
     output = run_command(args)
     end = time.time()
+    
+    output = None if output == "" else output
 
     return end - start, output
 
@@ -30,6 +32,8 @@ def memory_usage(args):
     output = run_command(args)
     memory_used = get_memory_usage() / (1024 * 1024)
     tracemalloc.stop()
+    
+    output = None if output == "" else output
     
     return memory_used, output
 

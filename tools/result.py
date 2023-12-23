@@ -5,9 +5,9 @@ import pandas as pd
 import database
 import os
 
-rcParams["font.family"] = "serif"
-rcParams["font.style"] = "normal"
-rcParams["text.usetex"] = True
+# rcParams["font.family"] = "serif"
+# rcParams["font.style"] = "normal"
+# rcParams["text.usetex"] = True
 
 def make_figure():
     fig = plt.figure(figsize=(20, 10))
@@ -37,7 +37,8 @@ def plot_result(
             AND provider = '{provider}'
             AND backend = '{backend}' 
             AND algorithm = '{algorithm}'
-            AND type = '{benchmark_type}';
+            AND type = '{benchmark_type}'
+            AND output IS NULL;
             """,
             conn,
         )
