@@ -2,7 +2,7 @@ from tools import benchmark
 
 def main():
     expr_rept = 1
-    num_qubits = list(range(2, 50))
+    num_qubits = list(range(2, 5))
     num_shots = [1]
     algorithms = [
                 "deutsch_jozsa",

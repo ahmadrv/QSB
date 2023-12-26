@@ -23,8 +23,6 @@ def plot_result(
     algorithm: str,
     benchmark_type: str,
 ):
-    # fig = plt.figure(figsize=(20, 10))
-    # ax = fig.add_subplot(111)
 
     conn = database.create_connection()
 
@@ -62,7 +60,7 @@ def plot_result(
 
         ax.plot(df["num_qubit"], df["value"], marker='o', label=f"{platform} {provider} {backend}")
         ax.set_xlabel("Number of Qubit")
-        ax.set_ylabel("Runtime (s)" if benchmark_type == "runtime" else "Memory Usage (MB)")
+        ax.set_ylabel("Runtime (s)" if benchmark_type == "runtime" else "Memory Usage (KB)")
         ax.legend()
 
 

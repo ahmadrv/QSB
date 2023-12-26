@@ -11,31 +11,26 @@ def run_command(command: list[str]) -> str:
     else:
         return result.stdout.decode()
 
-def get_memory_usage():
-    snapshot = tracemalloc.take_snapshot()
-    top_stats = snapshot.statistics('lineno')
-
-    total_size = sum(stat.size for stat in top_stats)
-    return total_size
 
 def runtime(args):
     start = time.time()
     output = run_command(args)
     end = time.time()
-    
+
     output = None if output == "" else output
 
     return end - start, output
 
-def memory_usage(args):         
+
+def memory_usage(args):
     tracemalloc.start()
     output = run_command(args)
-    memory_used = get_memory_usage() / (1024 * 1024)
+    _, peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
-    
+
     output = None if output == "" else output
-    
-    return memory_used, output
+    return peak / 1024, output
+
 
 def run(
     num_qubits: list[int],
@@ -90,7 +85,7 @@ def run(
             bench_time, output = runtime(cmd.output)
             benchmark += (bench_time, output, datetime.now())
 
-        elif cmd.benchmark_type == "memory_usage":   
+        elif cmd.benchmark_type == "memory_usage":
             memory_used, output = memory_usage(cmd.output)
             benchmark += (memory_used, output, datetime.now())
 
