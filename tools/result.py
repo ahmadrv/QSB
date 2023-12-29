@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 from matplotlib import rcParams
 # import plotly.graph_objects as go
 import pandas as pd
@@ -16,7 +17,7 @@ def make_figure():
     return ax, fig
 
 
-def plot_result(
+def add_plot(
     platform: str,
     provider: str,
     backend: str,
@@ -61,14 +62,18 @@ def plot_result(
         ax.plot(df["num_qubit"], df["value"], marker='o', label=f"{platform} {provider} {backend}")
         ax.set_xlabel("Number of Qubit")
         ax.set_ylabel("Runtime (s)" if benchmark_type == "runtime" else "Memory Usage (KB)")
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
         ax.legend()
 
 
 if __name__ == "__main__":
     ax, fig = make_figure()
     
-    plot_result("Qiskit", "aer", "qasm_simulator", "deutsch_jozsa", "runtime")
-    plot_result("Qiskit", "aer", "aer_simulator", "deutsch_jozsa", "runtime")
+    algorithm = "deutsch_jozsa"
+    bench_type = "runtime"  # "memory_usage" or "runtime"
     
-    fig.suptitle('Deutsch-Jozsa Memory Usage', fontsize=30)
-    plt.show()
+    add_plot("Qiskit", "aer", "qasm_simulator", algorithm, bench_type)
+    add_plot("Qiskit", "aer", "aer_simulator", algorithm, bench_type)
+    
+    fig.suptitle(algorithm, fontsize=30)
+    plt.savefig(f"results/plots/{algorithm}-{bench_type}.png")

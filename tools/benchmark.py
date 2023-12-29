@@ -1,35 +1,50 @@
-import subprocess, time, tracemalloc
+import subprocess, time, psutil
 from datetime import datetime
 from tools import command, database
 
 
-def run_command(command: list[str]) -> str:
-    result = subprocess.run(command, capture_output=True)
-    print(result)
-    if result.returncode != 0:
-        return result.stderr.decode()
-    else:
-        return result.stdout.decode()
+def mem_use(pid):
+    process = psutil.Process(pid)
+    memory_info = process.memory_info()
+    return memory_info.rss / (1024 * 1024)
 
 
-def runtime(args):
+def memory_usage(command):      # [ ]: Amother option is merge the runtime() and memory_usage()
+    mem_use_list = list()
+    with subprocess.Popen(
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    ) as proc:
+        while proc.poll() is None:
+            mem_use_list.append(mem_use(proc.pid))
+            time.sleep(0.1)
+        if proc.poll() == 0:
+            outs = proc.stdout.read1().decode("utf-8")
+        else:
+            outs = proc.stderr.read1().decode("utf-8")
+
+        print(proc.args)
+        proc.kill()
+
+    return max(mem_use_list), outs
+
+
+def runtime(command):           # [ ]: Amother option is merge the runtime() and memory_usage()
     start = time.time()
-    output = run_command(args)
-    end = time.time()
+    with subprocess.Popen(
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    ) as proc:
+        while proc.poll() is None:
+            time.sleep(0.1)
+        end = time.time()
+        if proc.poll() == 0:
+            outs = proc.stdout.read1().decode("utf-8")
+        else:
+            outs = proc.stderr.read1().decode("utf-8")
 
-    output = None if output == "" else output
+        print(proc.args)
+        proc.kill()
 
-    return end - start, output
-
-
-def memory_usage(args):
-    tracemalloc.start()
-    output = run_command(args)
-    _, peak = tracemalloc.get_traced_memory()
-    tracemalloc.stop()
-
-    output = None if output == "" else output
-    return peak / 1024, output
+    return end - start, outs
 
 
 def run(
