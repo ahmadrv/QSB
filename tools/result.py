@@ -1,131 +1,79 @@
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 from matplotlib import rcParams
-import plotly.graph_objects as go
+# import plotly.graph_objects as go
 import pandas as pd
+import database
 import os
 
-rcParams["font.family"] = "serif"
-rcParams["font.style"] = "normal"
-rcParams["text.usetex"] = True
+# rcParams["font.family"] = "serif"
+# rcParams["font.style"] = "normal"
+# rcParams["text.usetex"] = True
+
+def make_figure():
+    fig = plt.figure(figsize=(20, 10))
+    ax = fig.add_subplot(111)
+    
+    return ax, fig
 
 
-def make_csv_with_header(file_path: str, header: str):
-    """
-    Creates a new CSV file with the given file path and header.
+def add_plot(
+    platform: str,
+    provider: str,
+    backend: str,
+    algorithm: str,
+    benchmark_type: str,
+):
 
-    Args:
-        file_path (str): The file path where the CSV file will be created.
-        header (str): The header row for the CSV file.
+    conn = database.create_connection()
 
-    Returns:
-        None
-    """
-    directory = os.path.dirname(file_path)
-
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-        with open(file_path, "w") as f:
-            f.write(header + "\n")
-
-
-def add_result_to_file(result: str, file_path: str):
-    """
-    Appends the given result to the file at the specified file path.
-
-    Args:
-        result (str): The result to be added to the file.
-        file_path (str): The path to the file to which the result should be added.
-    """
-    with open(file_path, "a") as f:
-        f.write(result + "\n")
-
-
-def plot_result(file_paths: list[str], benchmark: str, z_axis_label: str):
-    """
-    Plots the benchmark results for different simulators and qubit numbers.
-
-    Args:
-    - file_paths (list): A list of file paths containing the benchmark results.
-    - benchmark (str): The name of the benchmark to plot.
-
-    Returns:
-    - None
-    """
-    fig = plt.figure(figsize=(30, 20))
-    ax = fig.add_subplot(111, projection="3d")
-
-    for idx, file_path in enumerate(file_paths):
-        df = pd.read_csv(file_path)
-        df_mean = df.groupby("qubit", as_index=False).mean()
-
-        ax.plot(df_mean["qubit"], df_mean[benchmark], zs=idx, zdir="y", label=file_path)
-
-    ax.set_xlabel("Number of qubit")
-    ax.set_ylabel("Simulators")
-    ax.set_zlabel(z_axis_label)
-    ax.legend()
-    plt.show()
-
-
-def plot_result_plotly(file_paths: list[str], benchmark: str):
-    """
-    Plots a 3D scatter plot using Plotly for the given file paths and benchmark.
-
-    Args:
-        file_paths (list[str]): A list of file paths containing the data to be plotted.
-        benchmark (str): The name of the benchmark to be plotted.
-
-    Returns:
-        None
-    """
-    fig = go.Figure()
-
-    for idx, file_path in enumerate(file_paths):
-        df = pd.read_csv(file_path)
-        df_mean = df.groupby("qubit").mean().reset_index()
-
-        fig.add_trace(
-            go.Scatter3d(
-                x=df_mean["qubit"],
-                y=[idx] * len(df_mean),
-                z=df_mean[benchmark],
-                mode="lines",
-                name=file_path,
+    with conn:
+        df = pd.read_sql_query(  # [ ]: Exception Handler Needed!
+            f"""
+            SELECT *
+            FROM benchmarks
+            WHERE platform = '{platform}'
+            AND provider = '{provider}'
+            AND backend = '{backend}' 
+            AND algorithm = '{algorithm}'
+            AND type = '{benchmark_type}'
+            AND output IS NULL;
+            """,
+            conn,
+        )
+        df = df.drop(["id", "date"], axis=1)
+        df = (
+            df.groupby(
+                [
+                    "platform",
+                    "provider",
+                    "backend",
+                    "algorithm",
+                    "num_qubit",
+                    "num_shot",
+                    "type",
+                ]
             )
+            .mean()
+            .reset_index()
+            .sort_values(by=["num_qubit"])
         )
 
-    fig.update_layout(
-        scene=dict(
-            xaxis=dict(title="Number of qubits"),
-            yaxis=dict(title="Simulators"),
-            zaxis=dict(title=benchmark),
-        ),
-        showlegend=False,
-        legend=dict(title="File Paths"),
-        width=800,
-        height=600,
-    )
-
-    fig.show()
+        ax.plot(df["num_qubit"], df["value"], marker='o', label=f"{platform} {provider} {backend}")
+        ax.set_xlabel("Number of Qubit")
+        ax.set_ylabel("Runtime (s)" if benchmark_type == "runtime" else "Memory Usage (KB)")
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+        ax.legend()
 
 
-def get_all_files(directory: str) -> list[str]:
-    """
-    Returns a list of all files in the given directory and its subdirectories.
-
-    Args:
-        directory (str): The directory to search for files.
-
-    Returns:
-        list: A list of file paths.
-    """
-    runtime_file_list = []
-    memory_usage_file_list = []
-
-    for root, ـ, files in os.walk(directory):
-        for file in files:
-            if 'runtime' in os.path.join(root, file):
-                runtime_file_list.append(os.path.join(root, file))
-            elif 'memory_usage' in os.path.join(root, file):
-                memory_usage_file_list.append(os.path.join(root, file))
-    return runtime_file_list, memory_usage_file_list
+if __name__ == "__main__":
+    ax, fig = make_figure()
+    
+    algorithm = "deutsch_jozsa"
+    bench_type = "runtime"  # "memory_usage" or "runtime"
+    
+    add_plot("Qiskit", "aer", "qasm_simulator", algorithm, bench_type)
+    add_plot("Qiskit", "aer", "aer_simulator", algorithm, bench_type)
+    
+    fig.suptitle(algorithm, fontsize=30)
+    plt.savefig(f"results/plots/{algorithm}-{bench_type}.png")

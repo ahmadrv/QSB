@@ -1,49 +1,61 @@
-import subprocess, time, psutil, command, result
+import subprocess, time, psutil
+from datetime import datetime
+from tools import command, database
 
 
-def runtime(*args) -> float:
-    """
-    Measures the runtime of a subprocess.
+def mem_use(pid):
+    process = psutil.Process(pid)
+    memory_info = process.memory_info()
+    return memory_info.rss / (1024 * 1024)
 
-    Args:
-        *args: The command to be executed by the subprocess.
+def check_available_mem():
+    return psutil.virtual_memory().available / 1024 ** 2
 
-    Returns:
-        The runtime of the subprocess in seconds, or None if the subprocess failed.
-    """
+
+def memory_usage(command):      # [ ]: Amother option is merge the runtime() and memory_usage()
+    mem_use_list = list()
+    with subprocess.Popen(
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    ) as proc:
+        while proc.poll() is None:
+            mem_use_list.append(mem_use(proc.pid))
+            time.sleep(0.1)
+            
+            if check_available_mem() - 100 <= mem_use_list[-1]:
+                return 'OutofMem', 'MemoryError'
+            
+        if proc.poll() == 0:
+            outs = proc.stdout.read1().decode("utf-8")
+        else:
+            outs = proc.stderr.read1().decode("utf-8")
+
+        outs = None if outs == "" else outs
+        
+        print(proc.args)
+        proc.kill()
+
+    return max(mem_use_list), outs
+
+
+def runtime(command):           # [ ]: Amother option is merge the runtime() and memory_usage()
     start = time.time()
-    try:
-        process = subprocess.Popen(args)
-        process.wait()
-    except Exception as e:
-        print(f"Runtime measurement failed: {e}")
-        return None
+    with subprocess.Popen(
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    ) as proc:
+        while proc.poll() is None:
+            time.sleep(0.1)
+        end = time.time()
+        if proc.poll() == 0:
+            outs = proc.stdout.read1().decode("utf-8")
+        else:
+            outs = proc.stderr.read1().decode("utf-8")
 
-    return time.time() - start
+        outs = None if outs == "" else outs
+        
+        print(proc.args)
+        proc.kill()
 
-
-def memory_usage(*args) -> float:
-    """
-    Returns the maximum memory usage of a process in MB.
-
-    Args:
-        *args: A list of arguments to be passed to the subprocess.
-
-    Returns:
-        The maximum memory usage of the process in MB.
-    """
-    with subprocess.Popen(list(args)) as process:
-        pid = process.pid
-        max_memory_usage = 0
-
-        while process.poll() is None:
-            memory_info = psutil.Process(pid).memory_info()
-            memory_usage = memory_info.rss
-
-            if memory_usage > max_memory_usage:
-                max_memory_usage = memory_usage
-
-        return max_memory_usage / 1048576
+    return end - start, outs
 
 
 def run(
@@ -82,17 +94,29 @@ def run(
     )
 
     for cmd in commands:
-        file_path = (
-            f"results/{cmd.platform}/{cmd.provider}/{cmd.backend}/"
-            f"{cmd.algorithm}/{cmd.benchmark_type}/{cmd.num_shots}shots.csv"
+        conn = database.create_connection()
+        database.initialization(conn)
+
+        benchmark = (
+            cmd.platform,
+            cmd.provider,
+            cmd.backend,
+            cmd.algorithm,
+            cmd.num_qubits,
+            cmd.num_shots,
+            cmd.benchmark_type,
         )
 
-        result.make_csv_with_header(file_path, f"qubit,{cmd.benchmark_type}")
-
         if cmd.benchmark_type == "runtime":
-            output = f"{cmd.num_qubits},{runtime(*cmd.output)}"
+            bench_time, output = runtime(cmd.output)
+            benchmark += (bench_time, output, datetime.now())
 
         elif cmd.benchmark_type == "memory_usage":
-            output = f"{cmd.num_qubits},{memory_usage(*cmd.output)}"
+            memory_used, output = memory_usage(cmd.output)
+            benchmark += (memory_used, output, datetime.now())
 
-        result.add_result_to_file(output, file_path)
+        benchmark_id = database.create_benchmark(conn, benchmark)
+
+
+if __name__ == "__main__":
+    pass
