@@ -1,5 +1,6 @@
 import sqlite3 as sl
 from sqlite3 import Error
+from datetime import datetime
 import pandas as pd
 
 default_database_addrs = "./results/benchmarks.db"
@@ -7,7 +8,7 @@ default_database_addrs = "./results/benchmarks.db"
 
 def display_table(conn):
     try:
-        print(pd.read_sql_query("SELECT * FROM benchmarks", conn).to_csv('test.csv'))
+        pd.read_sql_query("SELECT * FROM benchmarks", conn).to_csv(f'results/csvs/{datetime.now()}.csv')
     except Error as e:
         print(e)
 

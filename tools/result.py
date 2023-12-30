@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
+from datetime import datetime
 from matplotlib import rcParams
 # import plotly.graph_objects as go
 import pandas as pd
@@ -76,4 +77,4 @@ if __name__ == "__main__":
     add_plot("Qiskit", "aer", "aer_simulator", algorithm, bench_type)
     
     fig.suptitle(algorithm, fontsize=30)
-    plt.savefig(f"results/plots/{algorithm}-{bench_type}.png")
+    plt.savefig(f"results/plots/{algorithm}-{bench_type}-{datetime.now()}.png")
