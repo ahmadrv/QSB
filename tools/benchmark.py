@@ -8,6 +8,9 @@ def mem_use(pid):
     memory_info = process.memory_info()
     return memory_info.rss / (1024 * 1024)
 
+def check_available_mem():
+    return psutil.virtual_memory().available / 1024 ** 2
+
 
 def memory_usage(command):      # [ ]: Amother option is merge the runtime() and memory_usage()
     mem_use_list = list()
@@ -17,11 +20,17 @@ def memory_usage(command):      # [ ]: Amother option is merge the runtime() and
         while proc.poll() is None:
             mem_use_list.append(mem_use(proc.pid))
             time.sleep(0.1)
+            
+            if check_available_mem() - 100 <= mem_use_list[-1]:
+                return 'OutofMem', 'MemoryError'
+            
         if proc.poll() == 0:
             outs = proc.stdout.read1().decode("utf-8")
         else:
             outs = proc.stderr.read1().decode("utf-8")
 
+        outs = None if outs == "" else outs
+        
         print(proc.args)
         proc.kill()
 
@@ -41,6 +50,8 @@ def runtime(command):           # [ ]: Amother option is merge the runtime() and
         else:
             outs = proc.stderr.read1().decode("utf-8")
 
+        outs = None if outs == "" else outs
+        
         print(proc.args)
         proc.kill()
 
@@ -105,7 +116,6 @@ def run(
             benchmark += (memory_used, output, datetime.now())
 
         benchmark_id = database.create_benchmark(conn, benchmark)
-        print(benchmark_id)
 
 
 if __name__ == "__main__":
