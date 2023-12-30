@@ -12,7 +12,7 @@ def check_available_mem():
     return psutil.virtual_memory().available / 1024 ** 2
 
 
-def memory_usage(command):      # [ ]: Amother option is merge the runtime() and memory_usage()
+def memory_usage(command):      # [ ]: Another option is merge the runtime() and memory_usage()
     mem_use_list = list()
     with subprocess.Popen(
         command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
@@ -37,7 +37,7 @@ def memory_usage(command):      # [ ]: Amother option is merge the runtime() and
     return max(mem_use_list), outs
 
 
-def runtime(command):           # [ ]: Amother option is merge the runtime() and memory_usage()
+def runtime(command):           # [ ]: Another option is merge the runtime() and memory_usage()
     start = time.time()
     with subprocess.Popen(
         command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
