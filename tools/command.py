@@ -39,7 +39,6 @@ class Command:
         platform: str,
         provider: str,
         backend: str,
-        benchmark_type: str,
     ) -> None:
         self.supported = SupportedResources()
 
@@ -47,9 +46,6 @@ class Command:
         self.num_shots = num_shots
         self.algorithm = self._check_support(algorithm, self.supported.algorithms)
         self.platform = self._check_support(platform, self.supported.platforms)
-        self.benchmark_type = self._check_support(
-            benchmark_type, self.supported.benchmarks
-        )
         self.provider = self._check_support(
             provider, self.supported.providers(self.platform)
         )
@@ -110,7 +106,6 @@ def command_generator(
     platforms: list[str],
     providers: list[str],
     backends: list[str],
-    benchmarks: list[str],
 ):
     """
     Generate a command object for each combination of input parameters.
@@ -122,16 +117,15 @@ def command_generator(
         platforms (list[str]): List of strings representing the platform names.
         providers (list[str]): List of strings representing the provider names.
         backends (list[str]): List of strings representing the backend names.
-        benchmarks (list[str]): List of strings representing the benchmark types.
 
     Yields:
         Command: A command object with the given input parameters.
     """
     combinations_args = itertools.product(
-        num_qubits, num_shots, algorithms, platforms, providers, backends, benchmarks
+        num_qubits, num_shots, algorithms, platforms, providers, backends
     )
 
-    for qnum, snum, alg, plat, prov, back, bench in combinations_args:
+    for qnum, snum, alg, plat, prov, back in combinations_args:
         try:
             yield Command(
                 num_qubits=qnum,
@@ -139,8 +133,7 @@ def command_generator(
                 algorithm=alg,
                 platform=plat,
                 provider=prov,
-                backend=back,
-                benchmark_type=bench,
+                backend=back
             )
         except NotImplementedError as NIE:
             print(NIE)

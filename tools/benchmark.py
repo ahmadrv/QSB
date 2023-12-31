@@ -12,8 +12,9 @@ def check_available_mem():
     return psutil.virtual_memory().available / 1024 ** 2
 
 
-def memory_usage(command):      # [ ]: Another option is merge the runtime() and memory_usage()
+def measure(command):      
     mem_use_list = list()
+    start = time.time()
     with subprocess.Popen(
         command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
     ) as proc:
@@ -22,8 +23,9 @@ def memory_usage(command):      # [ ]: Another option is merge the runtime() and
             time.sleep(0.1)
             
             if check_available_mem() - 100 <= mem_use_list[-1]:
-                return 'OutofMem', 'MemoryError'
-            
+                end = time.time()
+                return end - start, 'OutofMem', 'MemoryError'
+        end = time.time() 
         if proc.poll() == 0:
             outs = proc.stdout.read1().decode("utf-8")
         else:
@@ -34,28 +36,7 @@ def memory_usage(command):      # [ ]: Another option is merge the runtime() and
         print(proc.args)
         proc.kill()
 
-    return max(mem_use_list), outs
-
-
-def runtime(command):           # [ ]: Another option is merge the runtime() and memory_usage()
-    start = time.time()
-    with subprocess.Popen(
-        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    ) as proc:
-        while proc.poll() is None:
-            time.sleep(0.1)
-        end = time.time()
-        if proc.poll() == 0:
-            outs = proc.stdout.read1().decode("utf-8")
-        else:
-            outs = proc.stderr.read1().decode("utf-8")
-
-        outs = None if outs == "" else outs
-        
-        print(proc.args)
-        proc.kill()
-
-    return end - start, outs
+    return end - start, max(mem_use_list), outs
 
 
 def run(
@@ -103,17 +84,13 @@ def run(
             cmd.backend,
             cmd.algorithm,
             cmd.num_qubits,
-            cmd.num_shots,
-            cmd.benchmark_type,
+            cmd.num_shots
         )
 
-        if cmd.benchmark_type == "runtime":
-            bench_time, output = runtime(cmd.output)
-            benchmark += (bench_time, output, datetime.now())
+        
+        bench_time, memory_used, output = measure(cmd.output)
+        benchmark += (bench_time, memory_used, output, datetime.now())
 
-        elif cmd.benchmark_type == "memory_usage":
-            memory_used, output = memory_usage(cmd.output)
-            benchmark += (memory_used, output, datetime.now())
 
         benchmark_id = database.create_benchmark(conn, benchmark)
 
