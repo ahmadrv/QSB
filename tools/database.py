@@ -42,8 +42,8 @@ def initialization(conn):
                                         algorithm text NOT NULL,
                                         num_qubit integer NOT NULL,
                                         num_shot integer NOT NULL,
-                                        type text NOT NULL,
-                                        value real NOT NULL,
+                                        runtime real NOT NULL,
+                                        memory real NOT NULL,
                                         output text,
                                         date text NOT NULL
                                     );
@@ -63,8 +63,8 @@ def create_benchmark(conn, benchmark):
         algorithm,
         num_qubit,
         num_shot,
-        type,
-        value,
+        runtime,
+        memory,
         output,
         date
     ) VALUES(?,?,?,?,?,?,?,?,?,?)

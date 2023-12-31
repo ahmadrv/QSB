@@ -47,8 +47,7 @@ def run(
     algorithm: list[str],
     platform: list[str],
     provider: list[str],
-    backend: list[str],
-    benchmarks: list[str],
+    backend: list[str]
 ):
     """
     Runs benchmarks for quantum algorithms on different platforms and providers.
@@ -72,8 +71,7 @@ def run(
         algorithm,
         platform,
         provider,
-        backend,
-        benchmarks,
+        backend
     )
 
     for cmd in commands:

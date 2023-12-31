@@ -22,8 +22,7 @@ def add_plot(
     platform: str,
     provider: str,
     backend: str,
-    algorithm: str,
-    benchmark_type: str,
+    algorithm: str
 ):
 
     conn = database.create_connection()
@@ -37,7 +36,6 @@ def add_plot(
             AND provider = '{provider}'
             AND backend = '{backend}' 
             AND algorithm = '{algorithm}'
-            AND type = '{benchmark_type}'
             AND output IS NULL;
             """,
             conn,
@@ -51,8 +49,7 @@ def add_plot(
                     "backend",
                     "algorithm",
                     "num_qubit",
-                    "num_shot",
-                    "type",
+                    "num_shot"
                 ]
             )
             .mean()
