@@ -24,6 +24,8 @@ def measure(command):
             
             if check_available_mem() - 100 <= mem_use_list[-1]:
                 end = time.time()
+                print(proc.args)
+                proc.kill()
                 return end - start, 'OutofMem', 'MemoryError'
         end = time.time() 
         if proc.poll() == 0:
@@ -93,6 +95,7 @@ def run(
 
 
         benchmark_id = database.create_benchmark(conn, benchmark)
+        print(benchmark_id)
 
 
 if __name__ == "__main__":
