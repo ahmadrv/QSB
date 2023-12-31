@@ -13,7 +13,6 @@ def main():
     platforms = ["Qiskit"]
     providers = ["aer"]
     backends = ["aer_simulator", "qasm_simulator"]
-    benchmarks = ["runtime", "memory_usage"]
 
     for _ in range(expr_rept):        
         benchmark.run(
@@ -22,8 +21,7 @@ def main():
             algorithms,
             platforms,
             providers,
-            backends,
-            benchmarks
+            backends
         ) 
 if __name__ == "__main__":
     main()
