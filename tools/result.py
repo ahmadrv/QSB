@@ -22,7 +22,8 @@ def add_plot(
     platform: str,
     provider: str,
     backend: str,
-    algorithm: str
+    algorithm: str,
+    benchmark_type: str,
 ):
 
     conn = database.create_connection()
@@ -57,9 +58,14 @@ def add_plot(
             .sort_values(by=["num_qubit"])
         )
 
-        ax.plot(df["num_qubit"], df["value"], marker='o', label=f"{platform} {provider} {backend}")
+        if benchmark_type == "runtime":
+            ax.plot(df["num_qubit"], df["runtime"], marker='o', label=f"{platform} {provider} {backend}")
+            ax.set_ylabel("Runtime (s)")
+        elif benchmark_type == "memory_usage":
+            ax.plot(df["num_qubit"], df["memory"], marker='o', label=f"{platform} {provider} {backend}")
+            ax.set_ylabel("Memory Usage (KB)")
+        
         ax.set_xlabel("Number of Qubit")
-        ax.set_ylabel("Runtime (s)" if benchmark_type == "runtime" else "Memory Usage (KB)")
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
         ax.legend()
 
@@ -68,7 +74,7 @@ if __name__ == "__main__":
     ax, fig = make_figure()
     
     algorithm = "deutsch_jozsa"
-    bench_type = "runtime"  # "memory_usage" or "runtime"
+    bench_type = "memory_usage"  # "memory_usage" or "runtime"
     
     add_plot("Qiskit", "aer", "qasm_simulator", algorithm, bench_type)
     add_plot("Qiskit", "aer", "aer_simulator", algorithm, bench_type)
