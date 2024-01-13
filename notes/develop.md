@@ -5,9 +5,9 @@
   - [x] Bernstain-Vazirani
   - [x] Simon
   - [x] QFT
-  - [ ] Quantum Phase Estimation
-  - [ ] Shor
-  - [ ] Grover
+  - [ ] Quantum Phase Estimation #
+  - [ ] Shor #
+  - [ ] Grover #
   - [ ] Quantum Counting
   - [ ] Quantum Walk Search
   - [ ] Superdence Coding

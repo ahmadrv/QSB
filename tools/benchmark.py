@@ -19,6 +19,12 @@ def measure(command):
         command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
     ) as proc:
         while proc.poll() is None:
+            
+            if time.time() - start > 3600:      # set timeout
+                print(proc.args)
+                proc.kill()
+                return time.time() - start, 'OutofTime', 'RuntimeError'
+            
             mem_use_list.append(mem_use(proc.pid))
             time.sleep(0.1)
             
