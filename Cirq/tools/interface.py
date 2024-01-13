@@ -28,4 +28,10 @@ parser.add_argument(
     help="The backend that it should be 'pure', 'QSimSimulator' or ... .",
 )
 
+parser.add_argument(
+    "--oracle_type",
+    type=str,
+    help="The backend that it should be 'balanced', 'constant' or 'basic' .",
+)
+
 args, additional_args = parser.parse_known_args()   # This line should be the last line of this file.

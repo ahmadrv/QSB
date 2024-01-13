@@ -31,26 +31,26 @@ def deutsch_jozsa_oracle(num_qubits: int) -> QuantumCircuit:
     """
     oracle = QuantumCircuit(num_qubits + 1)
 
-    if randint(0, 1):
-        oracle.x(num_qubits)
-
-    if randint(0, 1):
+    if args.oracle_type == 'constant':
+        if randint(0, 1):
+            oracle.x(num_qubits)
         return oracle
+    
+    elif args.oracle_type == 'balanced':
+        on_states = sample(range(2**num_qubits), 2**num_qubits // 2)
 
-    on_states = sample(range(2**num_qubits), 2**num_qubits // 2)
+        def add_cx(circuit, bit_string):
+            for qubit, bit in enumerate(reversed(bit_string)):
+                if bit == "1":
+                    circuit.x(qubit)
+            return circuit
 
-    def add_cx(circuit, bit_string):
-        for qubit, bit in enumerate(reversed(bit_string)):
-            if bit == "1":
-                circuit.x(qubit)
-        return circuit
+        for state in on_states:
+            oracle = add_cx(oracle, f"{state:0b}")
+            oracle.mcx(list(range(num_qubits)), num_qubits)
+            oracle = add_cx(oracle, f"{state:0b}")
 
-    for state in on_states:
-        oracle = add_cx(oracle, f"{state:0b}")
-        oracle.mcx(list(range(num_qubits)), num_qubits)
-        oracle = add_cx(oracle, f"{state:0b}")
-
-    return oracle
+        return oracle
 
 
 def deutsch_jozsa_algorithm(oracle: QuantumCircuit) -> QuantumCircuit:

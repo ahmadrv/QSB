@@ -1,7 +1,7 @@
 from tools import benchmark
 
 def main():
-    expr_rept = 5
+    expr_rept = 1
     num_qubits = list(range(2, 30))
     num_shots = [1]
     algorithms = [
@@ -12,7 +12,8 @@ def main():
     ]
     platforms = ["Qiskit"]
     providers = ["aer"]
-    backends = ["aer_simulator", "qasm_simulator"]
+    backends = ["aer_simulator"]    # "qasm_simulator", aer_simulator
+    oracle_types = ["balanced"] # "basic", "balanced", "constant"
 
     for _ in range(expr_rept):        
         benchmark.run(
@@ -21,7 +22,8 @@ def main():
             algorithms,
             platforms,
             providers,
-            backends
+            backends,
+            oracle_types
         ) 
 if __name__ == "__main__":
     main()

@@ -44,34 +44,21 @@ def measure(command):
 def run(
     num_qubits: list[int],
     num_shots: list[int],
-    algorithm: list[str],
-    platform: list[str],
-    provider: list[str],
-    backend: list[str]
+    algorithms: list[str],
+    platforms: list[str],
+    providers: list[str],
+    backends: list[str],
+    oracle_types: list[str]
 ):
-    """
-    Runs benchmarks for quantum algorithms on different platforms and providers.
-
-    Args:
-        num_qubits (list[int]): List of number of qubits to run the benchmarks on.
-        num_shots (list[int]): List of number of shots to run the benchmarks for.
-        algorithm (list[str]): List of quantum algorithms to run the benchmarks for.
-        platform (list[str]): List of platforms to run the benchmarks on.
-        provider (list[str]): List of providers to run the benchmarks on.
-        backend (list[str]): List of backends to run the benchmarks on.
-        benchmarks (list[str]): List of benchmarks to run.
-
-    Returns:
-        None
-    """
-
+   
     commands = command.command_generator(
         num_qubits,
         num_shots,
-        algorithm,
-        platform,
-        provider,
-        backend
+        algorithms,
+        platforms,
+        providers,
+        backends,
+        oracle_types
     )
 
     for cmd in commands:
@@ -84,7 +71,8 @@ def run(
             cmd.backend,
             cmd.algorithm,
             cmd.num_qubits,
-            cmd.num_shots
+            cmd.num_shots,
+            cmd.oracle_type
         )
 
         

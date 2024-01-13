@@ -33,29 +33,29 @@ def deutsch_jozsa_oracle(qubits: list[LineQubit]):
     num_qubits = len(qubits) - 1
     oracle = Circuit()
 
-    if randint(0, 1):
-        oracle.append(X(qubits[-2]))
-
-    if randint(0, 1):
+    if args.oracle_type == 'constant':
+        if randint(0, 1):
+            oracle.append(X(qubits[-2]))
         return oracle
 
-    on_states = sample(range(2 ** (num_qubits)), 2 ** (num_qubits) // 2)
+    elif args.oracle_type == 'balanced':
+        on_states = sample(range(2 ** (num_qubits)), 2 ** (num_qubits) // 2)
 
-    def add_cx(qubits, bit_string):
-        circuit = Circuit()
-        for qubit, bit in zip(qubits[:-1], bit_string):
-            if bit == "1":
-                circuit.append(X(qubit))
-        return circuit
+        def add_cx(qubits, bit_string):
+            circuit = Circuit()
+            for qubit, bit in zip(qubits[:-1], bit_string):
+                if bit == "1":
+                    circuit.append(X(qubit))
+            return circuit
 
-    mct = ControlledGate(sub_gate=X, num_controls=num_qubits)
+        mct = ControlledGate(sub_gate=X, num_controls=num_qubits)
 
-    for state in on_states:
-        oracle.append(add_cx(qubits, f"{state:0b}"))
-        oracle.append(mct(*qubits))
-        oracle.append(add_cx(qubits, f"{state:0b}"))
+        for state in on_states:
+            oracle.append(add_cx(qubits, f"{state:0b}"))
+            oracle.append(mct(*qubits))
+            oracle.append(add_cx(qubits, f"{state:0b}"))
 
-    return oracle
+        return oracle
 
 
 def deutsch_jozsa_algorithm(qubits: list[LineQubit], oracle: Circuit) -> Circuit:

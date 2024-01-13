@@ -39,6 +39,7 @@ class Command:
         platform: str,
         provider: str,
         backend: str,
+        oracle_type: str
     ) -> None:
         self.supported = SupportedResources()
 
@@ -52,6 +53,7 @@ class Command:
         self.backend = self._check_support(
             backend, self.supported.backends(self.platform, self.provider)
         )
+        self.oracle_type = oracle_type
 
         self.path = str(Path(self.platform) / self.algorithm) + ".py"
 
@@ -66,6 +68,8 @@ class Command:
             f"{self.provider}",
             "--backend",
             f"{self.backend}",
+            "--oracle_type",
+            f"{self.oracle_type}"
         ]
 
     def _check_support(self, item: str, supported: list[str]) -> str:
@@ -106,6 +110,7 @@ def command_generator(
     platforms: list[str],
     providers: list[str],
     backends: list[str],
+    oracle_types: list[str]
 ):
     """
     Generate a command object for each combination of input parameters.
@@ -122,10 +127,10 @@ def command_generator(
         Command: A command object with the given input parameters.
     """
     combinations_args = itertools.product(
-        num_qubits, num_shots, algorithms, platforms, providers, backends
+        num_qubits, num_shots, algorithms, platforms, providers, backends, oracle_types
     )
 
-    for qnum, snum, alg, plat, prov, back in combinations_args:
+    for qnum, snum, alg, plat, prov, back, orc_type in combinations_args:
         try:
             yield Command(
                 num_qubits=qnum,
@@ -133,7 +138,8 @@ def command_generator(
                 algorithm=alg,
                 platform=plat,
                 provider=prov,
-                backend=back
+                backend=back,
+                oracle_type=orc_type
             )
         except NotImplementedError as NIE:
             print(NIE)

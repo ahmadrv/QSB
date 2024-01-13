@@ -42,6 +42,7 @@ def initialization(conn):
                                         algorithm text NOT NULL,
                                         num_qubit integer NOT NULL,
                                         num_shot integer NOT NULL,
+                                        oracle_type text,
                                         runtime real NOT NULL,
                                         memory real NOT NULL,
                                         output text,
@@ -63,11 +64,12 @@ def create_benchmark(conn, benchmark):
         algorithm,
         num_qubit,
         num_shot,
+        oracle_type,
         runtime,
         memory,
         output,
         date
-    ) VALUES(?,?,?,?,?,?,?,?,?,?)
+    ) VALUES(?,?,?,?,?,?,?,?,?,?,?)
     """
     cur = conn.cursor()
     cur.execute(sql, benchmark)
