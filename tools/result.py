@@ -2,14 +2,12 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 from datetime import datetime
 from matplotlib import rcParams
-# import plotly.graph_objects as go
 import pandas as pd
 import database
-import os
 
-# rcParams["font.family"] = "serif"
-# rcParams["font.style"] = "normal"
-# rcParams["text.usetex"] = True
+rcParams["font.family"] = "serif"
+rcParams["font.style"] = "normal"
+rcParams["text.usetex"] = True
 
 def make_figure():
     fig = plt.figure(figsize=(20, 10))
@@ -50,7 +48,8 @@ def add_plot(
                     "backend",
                     "algorithm",
                     "num_qubit",
-                    "num_shot"
+                    "num_shot",
+                    "oracle_type"
                 ]
             )
             .mean()
@@ -59,10 +58,10 @@ def add_plot(
         )
 
         if benchmark_type == "runtime":
-            ax.plot(df["num_qubit"], df["runtime"], marker='o', label=f"{platform} {provider} {backend}")
+            ax.plot(df["num_qubit"], df["runtime"], marker='o', label=f"{algorithm}")
             ax.set_ylabel("Runtime (s)")
         elif benchmark_type == "memory_usage":
-            ax.plot(df["num_qubit"], df["memory"], marker='o', label=f"{platform} {provider} {backend}")
+            ax.plot(df["num_qubit"], df["memory"], marker='o', label=f"{algorithm}")
             ax.set_ylabel("Memory Usage (KB)")
         
         ax.set_xlabel("Number of Qubit")
@@ -73,11 +72,20 @@ def add_plot(
 if __name__ == "__main__":
     ax, fig = make_figure()
     
-    algorithm = "deutsch_jozsa"
-    bench_type = "memory_usage"  # "memory_usage" or "runtime"
+    platform = "Qiskit"
+    provider = "aer"
+    backend = "qasm_simulator"
     
-    add_plot("Qiskit", "aer", "qasm_simulator", algorithm, bench_type)
-    add_plot("Qiskit", "aer", "aer_simulator", algorithm, bench_type)
+    algs = ["deutsch_jozsa",
+            "bernstein_vazirani",
+            "quantum_fourier_transform",
+            "simon"]
     
-    fig.suptitle(algorithm, fontsize=30)
-    plt.savefig(f"results/plots/{algorithm}-{bench_type}-{datetime.now()}.png")
+    for alg in algs:
+        bench_type = "runtime"  # "memory_usage" or "runtime"
+        
+        add_plot(platform, provider, backend, alg, bench_type)
+        
+        fig.suptitle(f"{platform} {backend}", fontsize=30)
+
+    plt.savefig(f"results/plots/{platform}-{backend}-{bench_type}-{datetime.now()}.pdf")
