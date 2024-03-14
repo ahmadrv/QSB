@@ -3,15 +3,13 @@
 - Algorithms
   - [x] Deutsch-Jozsa
   - [x] Bernstain-Vazirani
-  - [x] Simon
   - [x] QFT
-  - [ ] Quantum Phase Estimation
-  - [ ] Shor
+  - [x] Simon
+  - [ ] Shor 
+  - [ ] HHL
   - [ ] Grover
-  - [ ] Quantum Counting
-  - [ ] Quantum Walk Search
-  - [ ] Superdence Coding
-  - [ ] Quantum teleportation
+  - [ ] Constraint Satisfaction (MaxCut)
+  - [ ] String Rewriting (Lack of Documentation)
 - Simulators
   - [x] Qiskit
     - [x] Aer
