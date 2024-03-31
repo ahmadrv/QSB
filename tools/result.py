@@ -72,9 +72,10 @@ def add_plot(
 if __name__ == "__main__":
     ax, fig = make_figure()
     
-    platform = "Qiskit"
-    provider = "aer"
-    backend = "qasm_simulator"
+    
+    platform = "Cirq"
+    provider = "qsimcirq"
+    backend = "QSimhSimulator"
     
     algs = ["deutsch_jozsa",
             "bernstein_vazirani",
@@ -86,6 +87,6 @@ if __name__ == "__main__":
         
         add_plot(platform, provider, backend, alg, bench_type)
         
-        fig.suptitle(f"{platform} {backend}", fontsize=30)
+        fig.suptitle(f"{platform} {provider} {backend}", fontsize=30)
 
-    plt.savefig(f"results/plots/{platform}-{backend}-{bench_type}-{datetime.now()}.pdf")
+    plt.savefig(f"results/plots/{platform}-{provider}-{backend}-{bench_type}-{datetime.now()}.pdf")

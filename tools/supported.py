@@ -48,7 +48,7 @@ class SupportedResources:
                     "pure",
                     # "mixed"
                 },
-                "qsimcirq": {"QSimSimulator", "QSimhSimulator"},
+                "qsimcirq": {"QSimSimulator"} #, "QSimhSimulator"},
             },
         }
 
