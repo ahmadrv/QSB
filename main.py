@@ -12,7 +12,7 @@ def main():
                 "grover"
     ]
     platforms = ["Qiskit"]
-    providers = ["aer"]
+    providers = ["ddsim"]
     backends = ["qasm_simulator"]
 
     for _ in range(expr_rept):        
