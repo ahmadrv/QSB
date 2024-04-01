@@ -12,8 +12,8 @@ def main():
                 "grover"
     ]
     platforms = ["Cirq"]
-    providers = ["cirq"]
-    backends = ["pure"]
+    providers = ["qsimcirq"]
+    backends = ["QSimSimulator"]
 
     for _ in range(expr_rept):        
         benchmark.run(
