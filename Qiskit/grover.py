@@ -58,7 +58,7 @@ def test():
     transpiled_circuit = transpile(circuit, backend)
     results = backend.run(transpiled_circuit, shots=num_shots).result()
     answer = results.get_counts()
-    print(answer, secret_string)
+    print(max(zip(answer.values(), answer.keys())), secret_string)
     
 if __name__ == '__main__':
     test()
