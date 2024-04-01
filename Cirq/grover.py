@@ -31,7 +31,7 @@ def grover_oracle(qubits: list[LineQubit]) -> Circuit:
     oracle.append([TOFFOLI(qubits[0], qubits[1], qubits[-1])])
     oracle.append([X(qubit) for qubit, bit in zip(qubits, secret_string) if bit == "0"])
     
-    return oracle, secret_string
+    return oracle
 
 
 def grover_algorithm(qubits: list[LineQubit], oracle: Circuit) -> Circuit:
