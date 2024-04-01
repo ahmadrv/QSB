@@ -54,9 +54,9 @@ def test():
     backend = Aer.get_backend('aer_simulator')
     oracle, secret_string = grover_oracle(num_qubits)
     circuit = grover_algorithm(oracle, num_qubits)
-    shots = 1024
+    num_shots = 1024
     transpiled_circuit = transpile(circuit, backend)
-    results = backend.run(transpiled_circuit, shots=args.num_shots).result()
+    results = backend.run(transpiled_circuit, shots=num_shots).result()
     answer = results.get_counts()
     print(answer, secret_string)
     
