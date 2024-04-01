@@ -1,4 +1,4 @@
-from qiskit import QuantumCircuit, transpile, Aer
+from qiskit import QuantumCircuit, transpile
 
 from tools.provider import get_backend
 from tools.interface import args
@@ -50,6 +50,7 @@ def grover_algorithm(
     return algorithm
 
 def test():
+    from qiskit import Aer
     num_qubits = 5
     backend = Aer.get_backend('aer_simulator')
     oracle, secret_string = grover_oracle(num_qubits)
@@ -61,4 +62,4 @@ def test():
     print(max(zip(answer.values(), answer.keys())), secret_string)
     
 if __name__ == '__main__':
-    test()
+    main()

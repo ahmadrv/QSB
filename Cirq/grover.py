@@ -7,7 +7,7 @@ https://github.com/quantumlib/Cirq/blob/main/examples/grover.py
 """
 
 from random import getrandbits
-from cirq import measure, LineQubit, Circuit, X, H, TOFFOLI, CNOT, Simulator
+from cirq import measure, LineQubit, Circuit, X, H, TOFFOLI, CNOT
 from tools.provider import get_backend
 from tools.interface import args
 
@@ -49,6 +49,7 @@ def grover_algorithm(qubits: list[LineQubit], oracle: Circuit) -> Circuit:
     return algorithm
 
 def test():
+    from cirq import Simulator
     num_qubits = 5
     circuit_sample_count = 10
     
