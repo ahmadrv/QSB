@@ -13,7 +13,7 @@ def main():
     ]
     platforms = ["Qiskit"]
     providers = ["aer"]
-    backends = ["aer_simulator"]
+    backends = ["qasm_simulator"]
 
     for _ in range(expr_rept):        
         benchmark.run(
