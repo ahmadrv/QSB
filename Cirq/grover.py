@@ -11,15 +11,15 @@ from cirq import measure, LineQubit, Circuit, X, H, TOFFOLI, CNOT, Simulator
 from tools.provider import get_backend
 from tools.interface import args
 
-# def main():
+def main():
     
-#     qubits = LineQubit.range(args.num_qubits + 1)
-#     oracle = grover_oracle(qubits)
-#     circuit = grover_algorithm(qubits, oracle)
-#     backend = get_backend(args.provider, args.backend)
-#     backend.run(
-#         circuit, repetitions=args.num_shots
-#     )  # [ ]: Is it essential to return the results of not?!
+    qubits = LineQubit.range(args.num_qubits + 1)
+    oracle = grover_oracle(qubits)
+    circuit = grover_algorithm(qubits, oracle)
+    backend = get_backend(args.provider, args.backend)
+    backend.run(
+        circuit, repetitions=args.num_shots
+    )  # [ ]: Is it essential to return the results of not?!
 
 
 def grover_oracle(qubits: list[LineQubit]) -> Circuit:    
@@ -48,35 +48,34 @@ def grover_algorithm(qubits: list[LineQubit], oracle: Circuit) -> Circuit:
 
     return algorithm
 
-def bitstring(bits):
-    return ''.join(str(int(b)) for b in bits)
-
-
-def main():
-    num_qubits = 5
-    circuit_sample_count = 10
+# def main():
+#     num_qubits = 5
+#     circuit_sample_count = 10
     
-    qubits = LineQubit.range(num_qubits + 1)
+#     qubits = LineQubit.range(num_qubits + 1)
 
-    # Make oracle (black box)
-    oracle, secret_string = grover_oracle(qubits)
+#     # Make oracle (black box)
+#     oracle, secret_string = grover_oracle(qubits)
 
-    # Embed the oracle into a quantum circuit implementing Grover's algorithm.
-    circuit = grover_algorithm(qubits, oracle)
-    print('Circuit:')
-    print(circuit)
+#     # Embed the oracle into a quantum circuit implementing Grover's algorithm.
+#     circuit = grover_algorithm(qubits, oracle)
+#     print('Circuit:')
+#     print(circuit)
 
-    # Sample from the circuit a couple times.
-    simulator = Simulator()
-    result = simulator.run(circuit, repetitions=circuit_sample_count)
+#     # Sample from the circuit a couple times.
+#     simulator = Simulator()
+#     result = simulator.run(circuit, repetitions=circuit_sample_count)
+    
+#     def bitstring(bits):
+#         return ''.join(str(int(b)) for b in bits)
 
-    frequencies = result.histogram(key='result', fold_func=bitstring)
-    print(f'Sampled results:\n{frequencies}')
+#     frequencies = result.histogram(key='result', fold_func=bitstring)
+#     print(f'Sampled results:\n{frequencies}')
 
-    # Check if we actually found the secret value.
-    most_common_bitstring = frequencies.most_common(1)[0][0]
-    print(f'Most common bitstring: {most_common_bitstring}')
-    print(f'Found a match: {most_common_bitstring == bitstring(secret_string)}')
+#     # Check if we actually found the secret value.
+#     most_common_bitstring = frequencies.most_common(1)[0][0]
+#     print(f'Most common bitstring: {most_common_bitstring}')
+#     print(f'Found a match: {most_common_bitstring == bitstring(secret_string)}')
 
 if __name__ == '__main__':
     main()
