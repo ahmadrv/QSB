@@ -3,16 +3,17 @@ from tools import benchmark
 def main():
     expr_rept = 5
     num_qubits = list(range(2, 30))
-    num_shots = [1]
+    num_shots = [1024]
     algorithms = [
-                "deutsch_jozsa",
+                # "deutsch_jozsa",
                 # "bernstein_vazirani",
                 # "quantum_fourier_transform",
-                # "simon"
+                # "simon",
+                "grover"
     ]
-    platforms = ["Qiskit"]
-    providers = ["aer"]
-    backends = ["aer_simulator", "qasm_simulator"]
+    platforms = ["Cirq"]
+    providers = ["cirq"]
+    backends = ["pure"]
 
     for _ in range(expr_rept):        
         benchmark.run(
