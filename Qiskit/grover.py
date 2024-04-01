@@ -1,4 +1,4 @@
-from qiskit import QuantumCircuit, transpile, Aer, assemble
+from qiskit import QuantumCircuit, transpile, Aer
 
 from tools.provider import get_backend
 from tools.interface import args
@@ -51,12 +51,12 @@ def grover_algorithm(
 
 def test():
     num_qubits = 5
-    aer_sim = Aer.get_backend('aer_simulator')
+    backend = Aer.get_backend('aer_simulator')
     oracle, secret_string = grover_oracle(num_qubits)
     circuit = grover_algorithm(oracle, num_qubits)
     shots = 1024
-    qobj = assemble(circuit, shots=shots)
-    results = aer_sim.run(qobj).result()
+    transpiled_circuit = transpile(circuit, backend)
+    results = backend.run(transpiled_circuit, shots=args.num_shots).result()
     answer = results.get_counts()
     print(answer, secret_string)
     
