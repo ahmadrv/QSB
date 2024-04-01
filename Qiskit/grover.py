@@ -24,7 +24,7 @@ def grover_oracle(num_qubits: int) -> QuantumCircuit:
     secret_string = secret_string[::-1]
     
     oracle.x([idx for idx, bit in zip(range(num_qubits), secret_string) if bit == "0"])
-    oracle.toffoli(0, 1, num_qubits)
+    oracle.ccx(0, 1, num_qubits)
     oracle.x([idx for idx, bit in zip(range(num_qubits), secret_string) if bit == "0"])
     
     return oracle, secret_string
