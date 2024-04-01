@@ -27,7 +27,8 @@ def grover_oracle(num_qubits: int) -> QuantumCircuit:
     oracle.ccx(0, 1, num_qubits)
     oracle.x([idx for idx, bit in zip(range(num_qubits), secret_string) if bit == "0"])
     
-    return oracle, secret_string
+    oracle = oracle.to_gate()
+    return oracle
 
 def grover_algorithm(
     oracle: QuantumCircuit, num_qubits: int
