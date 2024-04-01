@@ -11,9 +11,9 @@ def main():
                 # "simon",
                 "grover"
     ]
-    platforms = ["Cirq"]
-    providers = ["qsimcirq"]
-    backends = ["QSimSimulator"]
+    platforms = ["Qiskit"]
+    providers = ["aer"]
+    backends = ["aer_simulator"]
 
     for _ in range(expr_rept):        
         benchmark.run(
