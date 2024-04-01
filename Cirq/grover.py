@@ -48,34 +48,34 @@ def grover_algorithm(qubits: list[LineQubit], oracle: Circuit) -> Circuit:
 
     return algorithm
 
-# def main():
-#     num_qubits = 5
-#     circuit_sample_count = 10
+def test():
+    num_qubits = 5
+    circuit_sample_count = 10
     
-#     qubits = LineQubit.range(num_qubits + 1)
+    qubits = LineQubit.range(num_qubits + 1)
 
-#     # Make oracle (black box)
-#     oracle, secret_string = grover_oracle(qubits)
+    # Make oracle (black box)
+    oracle, secret_string = grover_oracle(qubits)
 
-#     # Embed the oracle into a quantum circuit implementing Grover's algorithm.
-#     circuit = grover_algorithm(qubits, oracle)
-#     print('Circuit:')
-#     print(circuit)
+    # Embed the oracle into a quantum circuit implementing Grover's algorithm.
+    circuit = grover_algorithm(qubits, oracle)
+    print('Circuit:')
+    print(circuit)
 
-#     # Sample from the circuit a couple times.
-#     simulator = Simulator()
-#     result = simulator.run(circuit, repetitions=circuit_sample_count)
+    # Sample from the circuit a couple times.
+    simulator = Simulator()
+    result = simulator.run(circuit, repetitions=circuit_sample_count)
     
-#     def bitstring(bits):
-#         return ''.join(str(int(b)) for b in bits)
+    def bitstring(bits):
+        return ''.join(str(int(b)) for b in bits)
 
-#     frequencies = result.histogram(key='result', fold_func=bitstring)
-#     print(f'Sampled results:\n{frequencies}')
+    frequencies = result.histogram(key='result', fold_func=bitstring)
+    print(f'Sampled results:\n{frequencies}')
 
-#     # Check if we actually found the secret value.
-#     most_common_bitstring = frequencies.most_common(1)[0][0]
-#     print(f'Most common bitstring: {most_common_bitstring}')
-#     print(f'Found a match: {most_common_bitstring == bitstring(secret_string)}')
+    # Check if we actually found the secret value.
+    most_common_bitstring = frequencies.most_common(1)[0][0]
+    print(f'Most common bitstring: {most_common_bitstring}')
+    print(f'Found a match: {most_common_bitstring == bitstring(secret_string)}')
 
 if __name__ == '__main__':
     main()
