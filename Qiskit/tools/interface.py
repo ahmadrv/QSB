@@ -29,4 +29,10 @@ parser.add_argument(
     help="The backend that it should be 'qasm_simulator', 'statevector_simulator' or ... .",
 )
 
+parser.add_argument(
+    "--precision",
+    type=int,
+    help="The precision for phase estimation problem.",
+)
+
 args, additional_args = parser.parse_known_args()   # This line should be the last line of this file.

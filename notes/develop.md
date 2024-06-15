@@ -7,7 +7,7 @@
   - [x] Simon
   - [ ] Shor 
   - [ ] HHL
-  - [ ] Grover
+  - [x] Grover
   - [ ] Constraint Satisfaction (MaxCut)
   - [ ] String Rewriting (Lack of Documentation)
 - Simulators

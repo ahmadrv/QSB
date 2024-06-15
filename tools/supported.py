@@ -20,7 +20,8 @@ class SupportedResources:
             "bernstein_vazirani",
             "quantum_fourier_transform",
             "simon",
-            "grover"
+            "grover",
+            "shor",
         }
 
         self._platforms = {"Qiskit", "Cirq"}
