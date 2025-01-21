@@ -1,15 +1,15 @@
 from tools import benchmark
 
 def main():
-    expr_rept = 5
+    expr_rept = 1
     num_qubits = list(range(2, 30))
     num_shots = [1024]
     algorithms = [
                 # "deutsch_jozsa",
                 # "bernstein_vazirani",
-                # "quantum_fourier_transform",
+                "quantum_fourier_transform",
                 # "simon",
-                "grover"
+                # "grover"
     ]
     platforms = ["Qiskit"]
     providers = ["ddsim"]
